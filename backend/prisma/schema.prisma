@@ -36,3 +36,99 @@ model MagicToken {
   expiresAt DateTime
   createdAt DateTime @default(now())
 }
+
+// ─── PHHC Case Data ──────────────────────────────────────────────
+
+model Case {
+  id              String    @id @default(uuid())
+  caseType        String // e.g. "CWP"
+  caseNo          String
+  caseYear        Int
+  cnrNo           String?
+  filingNo        String?
+  regDate         DateTime?
+  petName         String? // Petitioner name
+  resName         String? // Respondent name
+  petAdvName      String? // Petitioner advocate
+  resAdvName      String? // Respondent advocate
+  benchName       String?
+  status          String? // PENDING, DISPOSED, etc.
+  category        String?
+  categoryDesc    String?
+  district        String?
+  establishment   String?
+  nextListingDate DateTime?
+  disposalDate    DateTime?
+  disposalType    String?
+
+  // Raw JSON blob from the API for any extra fields
+  rawData Json?
+
+  parties    CaseParty[]
+  hearings   CaseHearing[]
+  orders     CaseOrder[]
+  objections CaseObjection[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([caseType, caseNo, caseYear])
+}
+
+model CaseParty {
+  id      String  @id @default(uuid())
+  caseId  String
+  case    Case    @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  srNo    Int     @default(0)
+  type    String // "P" = Petitioner, "R" = Respondent
+  name    String
+  address String?
+  email   String?
+  mobile  String?
+  age     Int?
+  sex     String?
+
+  createdAt DateTime @default(now())
+}
+
+model CaseHearing {
+  id            String   @id @default(uuid())
+  caseId        String
+  case          Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  hearingDate   DateTime
+  benchCode     Int?
+  benchName     String?
+  benchType     String?
+  srNo          Int?
+  listType      String? // URGENT, SUPPLEMENTARY, etc.
+  hearingStatus String?
+  courtNo       String?
+
+  createdAt DateTime @default(now())
+
+  @@unique([caseId, hearingDate, srNo])
+}
+
+model CaseOrder {
+  id        String   @id @default(uuid())
+  caseId    String
+  case      Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  orderDate DateTime
+  orderType String? // "I" = Interim, "F" = Final
+  benchName String?
+  benchCode Int?
+  pdfUrl    String?
+  pdfName   String?
+
+  createdAt DateTime @default(now())
+
+  @@unique([caseId, orderDate, orderType])
+}
+
+model CaseObjection {
+  id        String   @id @default(uuid())
+  caseId    String
+  case      Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  rawData   Json // Store the entire objection object
+  createdAt DateTime @default(now())
+}
