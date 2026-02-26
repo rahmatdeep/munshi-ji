@@ -1,9 +1,9 @@
 import { Resend } from 'resend';
 
-const resendApiKey = process.env.RESEND_API_KEY;
-const resend = resendApiKey ? new Resend(resendApiKey) : null;
-
 export const sendMagicLink = async (email: string, token: string) => {
+    console.log(`Sending magic link to: ${email}`);
+    const resendApiKey = process.env.RESEND_API_KEY;
+    const resend = resendApiKey ? new Resend(resendApiKey) : null;
     const magicLink = `${process.env.FRONTEND_URL}/verify-magic-link?token=${token}`;
 
     if (!resend) {
@@ -14,7 +14,7 @@ export const sendMagicLink = async (email: string, token: string) => {
 
     try {
         const { data, error } = await resend.emails.send({
-            from: 'Auth <onboarding@resend.dev>',
+            from: 'auth@resend.pardhan.cc',
             to: [email],
             subject: 'Your Magic Login Link',
             html: `
@@ -28,8 +28,8 @@ export const sendMagicLink = async (email: string, token: string) => {
         });
 
         if (error) {
-            console.error('Resend error:', error);
-            throw new Error('Failed to send email');
+            console.error('Resend API error:', JSON.stringify(error, null, 2));
+            throw new Error(`Failed to send email: ${error.message}`);
         }
 
         return data;

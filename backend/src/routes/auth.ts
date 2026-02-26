@@ -22,9 +22,11 @@ const hashToken = (token: string) => {
 };
 
 router.post('/request-magic-link', async (req: Request, res: Response): Promise<Response | void> => {
+    console.log('Magic link requested for:', req.body.email);
     const result = requestMagicLinkSchema.safeParse(req.body);
 
     if (!result.success) {
+        console.log('Validation failed:', result.error.issues);
         return res.status(400).json({ errors: result.error.issues });
     }
 
@@ -36,8 +38,11 @@ router.post('/request-magic-link', async (req: Request, res: Response): Promise<
         });
 
         if (!user) {
+            console.log('User not found in DB for email:', email);
             return res.json({ message: 'If an account exists, a magic link has been sent.' });
         }
+
+        console.log('User found:', user.id, '- generating token...');
 
         // Generate a random plain-text token
         const token = crypto.randomBytes(32).toString('hex');
@@ -58,6 +63,7 @@ router.post('/request-magic-link', async (req: Request, res: Response): Promise<
         });
 
         // Send the raw token to the user's email
+        console.log('Calling sendMagicLink...');
         await sendMagicLink(email, token);
 
         return res.json({ message: 'If an account exists, a magic link has been sent.' });
