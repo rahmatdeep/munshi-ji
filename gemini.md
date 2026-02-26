@@ -4,3 +4,4 @@
 - **Authentication**: This project uses **Magic Link Login** via Resend. Password-based authentication has been removed.
 - **Email Service**: Use Resend for all communications.
 - **Database**: Prisma with PostgreSQL.
+- **Styling**: Tailwind CSS v4.
