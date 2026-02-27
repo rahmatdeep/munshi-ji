@@ -2,8 +2,9 @@ import { Router, Response } from 'express';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 import { fetchPHHCCase, storePHHCCase } from '../services/phhc';
 import { fetchCaseSchema } from '../types/phhc';
-import { saveCaseSchema, unsaveCaseSchema } from '../types/savedCase';
+import { saveCaseSchema, unsaveCaseSchema, shareCaseSchema } from '../types/savedCase';
 import prisma from '../lib/prisma';
+import { sendShareCaseEmail } from '../lib/mail';
 
 const router = Router();
 
@@ -60,29 +61,45 @@ router.post('/save', authMiddleware, async (req: AuthRequest, res: Response): Pr
     }
 
     try {
-        // 1. Fetch fresh data from PHHC
-        const phhcData = await fetchPHHCCase({
-            case_type: caseType,
-            case_no: caseNo,
-            case_year: caseYear
-        });
+        let storedCase;
 
-        if (!phhcData) {
-            return res.status(404).json({ error: 'Case not found on PHHC' });
+        if (result.data.caseId) {
+            // Option A: Save by ID (Shared case)
+            storedCase = await prisma.case.findUnique({
+                where: { id: result.data.caseId }
+            });
+
+            if (!storedCase) {
+                return res.status(404).json({ error: 'Case not found' });
+            }
+        } else if (result.data.caseType && result.data.caseNo && result.data.caseYear) {
+            // Option B: Fetch and Save
+            const { caseType, caseNo, caseYear } = result.data;
+
+            // 1. Fetch fresh data from PHHC
+            const phhcData = await fetchPHHCCase({
+                case_type: caseType,
+                case_no: caseNo,
+                case_year: caseYear
+            });
+
+            if (!phhcData) {
+                return res.status(404).json({ error: 'Case not found on PHHC' });
+            }
+
+            // 2. Store in DB
+            storedCase = await storePHHCCase({
+                case_type: caseType,
+                case_no: caseNo,
+                case_year: caseYear
+            }, phhcData);
         }
-
-        // 2. Store in DB and link to user
-        const storedCase = await storePHHCCase({
-            case_type: caseType,
-            case_no: caseNo,
-            case_year: caseYear
-        }, phhcData);
 
         if (!storedCase) {
-            return res.status(500).json({ error: 'Failed to store case data' });
+            return res.status(400).json({ error: 'Invalid request parameters' });
         }
 
-        // Link the case to the user
+        // 3. Link the case to the user (implicit many-to-many handles duplicate connections gracefully)
         await prisma.user.update({
             where: { id: userId },
             data: {
@@ -193,6 +210,81 @@ router.get('/saved', authMiddleware, async (req: AuthRequest, res: Response): Pr
         });
     } catch (error) {
         console.error('Fetch saved cases error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+/**
+ * GET /api/cases/:id
+ * Retrieves a single case by ID with full details.
+ */
+router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response): Promise<Response | void> => {
+    const id = req.params.id as string;
+
+    try {
+        const caseDetails = await prisma.case.findUnique({
+            where: { id },
+            include: {
+                parties: true,
+                hearings: true,
+                orders: true,
+                objections: true,
+            }
+        });
+
+        if (!caseDetails) {
+            return res.status(404).json({ error: 'Case not found' });
+        }
+
+        return res.json({ case: caseDetails });
+    } catch (error) {
+        console.error('Fetch case by ID error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+/**
+ * POST /api/cases/share
+ * Shares a case with another user via email.
+ */
+router.post('/share', authMiddleware, async (req: AuthRequest, res: Response): Promise<Response | void> => {
+    const result = shareCaseSchema.safeParse(req.body);
+
+    if (!result.success) {
+        return res.status(400).json({ errors: result.error.issues });
+    }
+
+    const { caseId, recipientEmail } = result.data;
+    const userId = req.user?.userId;
+
+    if (!userId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    try {
+        // 1. Verify the case exists
+        const caseRecord = await prisma.case.findUnique({
+            where: { id: caseId }
+        });
+
+        if (!caseRecord) {
+            return res.status(404).json({ error: 'Case not found' });
+        }
+
+        // 2. Get sharer name
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { name: true, email: true }
+        });
+
+        const sharerName = user?.name || user?.email || 'A user';
+
+        // 3. Send email via Resend
+        await sendShareCaseEmail(recipientEmail, caseId, sharerName);
+
+        return res.json({ message: 'Case shared successfully' });
+    } catch (error) {
+        console.error('Case share error:', error);
         return res.status(500).json({ error: 'Internal server error' });
     }
 });
