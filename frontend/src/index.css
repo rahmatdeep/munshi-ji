@@ -2,49 +2,51 @@
 @import "tailwindcss";
 
 @layer base {
-    :root {
-        /* User exact colors */
-        --color-brown: #8A7650;
-        --color-sage: #8E977D;
-        --color-cream: #ECE7D1;
-        --color-tan: #DBCEA5;
+  :root {
+    /* User exact colors */
+    --color-brown: #8a7650;
+    --color-sage: #8e977d;
+    --color-cream: #ece7d1;
+    --color-tan: #dbcea5;
 
-        /* Mapped to roles */
-        --background: var(--color-cream);
-        --foreground: var(--color-brown);
+    /* Mapped to roles */
+    --background: var(--color-cream);
+    --foreground: var(--color-brown);
 
-        --card: var(--color-cream);
-        --card-border: var(--color-tan);
+    --card: var(--color-cream);
+    --card-border: var(--color-tan);
 
-        --primary: var(--color-brown);
-        --primary-fg: var(--color-cream);
+    --primary: var(--color-brown);
+    --primary-fg: var(--color-cream);
 
-        --muted: var(--color-tan);
-        --muted-fg: var(--color-sage);
+    --muted: var(--color-tan);
+    --muted-fg: var(--color-sage);
 
-        --accent: var(--color-sage);
-        --accent-fg: var(--color-cream);
-    }
+    --accent: var(--color-sage);
+    --accent-fg: var(--color-cream);
+  }
 
-    body {
+  body {
         font-family: 'Inter', sans-serif;
-        background-color: var(--background);
-        color: var(--foreground);
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-    }
+    background-color: var(--background);
+    color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 }
 
 @layer utilities {
-    .font-serif-logo {
+  .font-serif-logo {
         font-family: 'Playfair Display', serif;
-    }
+  }
 
-    .glass-card {
-        @apply bg-[var(--card)]/80 backdrop-blur-xl border border-[var(--card-border)] shadow-xl shadow-[var(--color-sage)]/10;
-    }
+  .glass-card {
+    @apply bg-(--card)/80 backdrop-blur-xl border border-(--card-border) shadow-xl shadow-(--color-sage)/10;
+    transform: translateZ(0);
+    will-change: transform, opacity;
+  }
 
-    .glass-input {
-        @apply bg-[var(--background)] border border-[var(--color-tan)] focus:bg-[var(--background)] focus:border-[var(--color-brown)] focus:ring-4 focus:ring-[var(--color-brown)]/10 transition-all duration-300 text-[var(--color-brown)] placeholder:text-[var(--color-sage)];
-    }
+  .glass-input {
+    @apply bg-(--background) border border-(--color-tan) focus:bg-(--background) focus:border-(--color-brown) focus:ring-4 focus:ring-(--color-brown)/10 transition-all duration-300 text-(--color-brown) placeholder:text-(--color-sage);
+  }
 }
