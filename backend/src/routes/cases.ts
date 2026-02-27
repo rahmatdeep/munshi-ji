@@ -121,12 +121,34 @@ router.post('/unsave', authMiddleware, async (req: AuthRequest, res: Response): 
     }
 
     try {
-        await prisma.user.update({
-            where: { id: userId },
-            data: {
-                savedCases: {
-                    disconnect: { id: caseId }
+        // Use a transaction to ensure atomicity
+        await prisma.$transaction(async (tx) => {
+            // 1. Disconnect the user from the case
+            await tx.user.update({
+                where: { id: userId },
+                data: {
+                    savedCases: {
+                        disconnect: { id: caseId }
+                    }
                 }
+            });
+
+            // 2. Check if any other users still have this case saved
+            const caseWithCount = await tx.case.findUnique({
+                where: { id: caseId },
+                include: {
+                    _count: {
+                        select: { savedBy: true }
+                    }
+                }
+            });
+
+            // 3. If no users are linked, delete the case
+            // Cascading deletes on the schema level will handle related models
+            if (caseWithCount && caseWithCount._count.savedBy === 0) {
+                await tx.case.delete({
+                    where: { id: caseId }
+                });
             }
         });
 
