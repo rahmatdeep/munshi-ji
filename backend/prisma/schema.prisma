@@ -26,6 +26,7 @@ model User {
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
   magicToken MagicToken?
+  savedCases Case[]
 }
 
 model MagicToken {
@@ -68,6 +69,7 @@ model Case {
   hearings   CaseHearing[]
   orders     CaseOrder[]
   objections CaseObjection[]
+  savedBy    User[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -17,7 +17,8 @@ import {
     OrderItem,
     ObjectionResponse,
     PartyDetail,
-    HearingItem
+    HearingItem,
+    FullPHHCCaseData
 } from '../types/phhc';
 
 /**
@@ -32,9 +33,12 @@ async function phhcFetch<T>(url: string): Promise<T> {
 }
 
 
-// ─── Main service function ───────────────────────────────────────
+// ─── Main service functions ──────────────────────────────────────
 
-export async function fetchAndStorePHHCCase(input: FetchCaseInput) {
+/**
+ * Only fetches data from PHHC APIs. Does NOT touch the database.
+ */
+export async function fetchPHHCCase(input: FetchCaseInput): Promise<FullPHHCCaseData | null> {
     const { case_type, case_no, case_year } = input;
 
     // 1. Fetch all 5 endpoints in parallel
@@ -56,8 +60,31 @@ export async function fetchAndStorePHHCCase(input: FetchCaseInput) {
         ),
     ]);
 
-    // 2. Upsert the case inside a transaction
-    const result = await prisma.$transaction(async (tx) => {
+    // Check if case exists on PHHC (caseData is usually present but maybe empty?)
+    // Based on previous code, if caseData exists we proceed. 
+    // Usually caseData.cnr_no or similar would be missing if not found.
+    if (!caseData || !caseData.case_no) {
+        return null;
+    }
+
+    return {
+        caseData,
+        hearingData,
+        ordersData,
+        objectionsData,
+        appealData,
+    };
+}
+
+/**
+ * Persists the already-fetched PHHC data into the database.
+ */
+export async function storePHHCCase(input: FetchCaseInput, data: FullPHHCCaseData) {
+    const { case_type, case_no, case_year } = input;
+    const { caseData, hearingData, ordersData, objectionsData, appealData } = data;
+
+    // Upsert the case inside a transaction
+    return prisma.$transaction(async (tx) => {
         // Upsert the core case record
         const savedCase = await tx.case.upsert({
             where: {
@@ -218,6 +245,13 @@ export async function fetchAndStorePHHCCase(input: FetchCaseInput) {
             },
         });
     });
+}
 
-    return result;
+/**
+ * Legacy wrapper: Fetches and stores PHHC data.
+ */
+export async function fetchAndStorePHHCCase(input: FetchCaseInput) {
+    const data = await fetchPHHCCase(input);
+    if (!data) return null;
+    return storePHHCCase(input, data);
 }

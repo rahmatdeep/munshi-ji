@@ -74,6 +74,14 @@ export interface ObjectionResponse {
     data: Record<string, unknown>[];
 }
 
+export interface FullPHHCCaseData {
+    caseData: CaseResponse;
+    hearingData: HearingResponse;
+    ordersData: OrderItem[];
+    objectionsData: ObjectionResponse;
+    appealData: unknown[];
+}
+
 export const VALID_CASE_TYPES = [
     'CWP', 'CRM-M', 'CR', 'RSA', 'CRR', 'CRA-S', 'FAO', 'CM', 'CRM', 'ARB',
     'ARB-DC', 'ARB-ICA', 'CA', 'CA-CWP', 'CA-MISC', 'CACP', 'CAPP', 'CCEC',
