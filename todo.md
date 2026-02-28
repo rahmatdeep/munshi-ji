@@ -1,0 +1,3 @@
+- ability to add more users
+- discussion board name to be changed to something else
+- dashboard ui to be better especially when it is empty
