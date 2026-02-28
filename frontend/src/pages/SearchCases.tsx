@@ -14,8 +14,10 @@ import {
   ChevronRight,
   Briefcase,
   BookmarkMinus,
+  Share2,
 } from "lucide-react";
 import CaseView from "../components/CaseView";
+import ShareModal from "../components/ShareModal";
 
 const VALID_CASE_TYPES = [
   "CWP",
@@ -164,6 +166,7 @@ export default function SearchCases() {
   const [isSaved, setIsSaved] = useState(false);
   const [savedCaseId, setSavedCaseId] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -533,28 +536,37 @@ export default function SearchCases() {
                   caseYear={caseYear}
                 >
                   {isSaved ? (
-                    <button
-                      onClick={handleUnsaveCase}
-                      disabled={isSaving}
-                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold shadow-md transition-all bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 shadow-red-500/10 hover:-translate-y-0.5 disabled:opacity-80 disabled:cursor-not-allowed"
-                    >
-                      {isSaving ? (
-                        <motion.div
-                          animate={{ rotate: 360 }}
-                          transition={{
-                            duration: 1,
-                            repeat: Infinity,
-                            ease: "linear",
-                          }}
-                          className="w-4 h-4 border-2 border-red-200 border-t-red-600 rounded-full"
-                        />
-                      ) : (
-                        <>
-                          <BookmarkMinus className="w-4 h-4" />
-                          Unsave Case
-                        </>
-                      )}
-                    </button>
+                    <div className="flex flex-col sm:flex-row items-center gap-3">
+                      <button
+                        onClick={() => setIsShareModalOpen(true)}
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold shadow-md transition-all bg-white border border-(--primary)/20 text-(--primary) hover:bg-(--primary)/5 hover:border-(--primary)/40 hover:-translate-y-0.5"
+                      >
+                        <Share2 className="w-4 h-4" />
+                        Share Case
+                      </button>
+                      <button
+                        onClick={handleUnsaveCase}
+                        disabled={isSaving}
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold shadow-md transition-all bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 shadow-red-500/10 hover:-translate-y-0.5 disabled:opacity-80 disabled:cursor-not-allowed"
+                      >
+                        {isSaving ? (
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{
+                              duration: 1,
+                              repeat: Infinity,
+                              ease: "linear",
+                            }}
+                            className="w-4 h-4 border-2 border-red-200 border-t-red-600 rounded-full"
+                          />
+                        ) : (
+                          <>
+                            <BookmarkMinus className="w-4 h-4" />
+                            Unsave Case
+                          </>
+                        )}
+                      </button>
+                    </div>
                   ) : (
                     <button
                       onClick={handleSaveCase}
@@ -594,6 +606,14 @@ export default function SearchCases() {
           </AnimatePresence>
         </div>
       </main>
+
+      {savedCaseId && (
+        <ShareModal
+          isOpen={isShareModalOpen}
+          onClose={() => setIsShareModalOpen(false)}
+          caseId={savedCaseId}
+        />
+      )}
     </div>
   );
 }

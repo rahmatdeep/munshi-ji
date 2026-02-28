@@ -3,8 +3,16 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
-import { Briefcase, ArrowLeft, Trash2, ShieldAlert } from "lucide-react";
+import {
+  Briefcase,
+  ArrowLeft,
+  Trash2,
+  ShieldAlert,
+  Share2,
+} from "lucide-react";
 import CaseView from "../components/CaseView";
+import ShareModal from "../components/ShareModal";
+import NotesSection from "../components/NotesSection";
 
 export default function CaseDetails() {
   const { id } = useParams<{ id: string }>();
@@ -16,6 +24,7 @@ export default function CaseDetails() {
   const [error, setError] = useState("");
   const [caseData, setCaseData] = useState<any>(null);
   const [isRemoving, setIsRemoving] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchCaseDetails = async () => {
@@ -193,33 +202,56 @@ export default function CaseDetails() {
                 caseNo={caseData.caseNo}
                 caseYear={caseData.caseYear}
               >
-                <button
-                  onClick={handleUnsave}
-                  disabled={isRemoving}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold shadow-md transition-all bg-white border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 hover:shadow-red-500/10 hover:-translate-y-0.5 disabled:opacity-80 disabled:cursor-not-allowed"
-                >
-                  {isRemoving ? (
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{
-                        duration: 1,
-                        repeat: Infinity,
-                        ease: "linear",
-                      }}
-                      className="w-4 h-4 border-2 border-red-600/30 border-t-red-600 rounded-full"
-                    />
-                  ) : (
-                    <>
-                      <Trash2 className="w-4 h-4" />
-                      Remove from Dashboard
-                    </>
-                  )}
-                </button>
+                <div className="flex flex-col sm:flex-row items-center gap-3">
+                  <button
+                    onClick={() => setIsShareModalOpen(true)}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold shadow-md transition-all bg-white border border-(--primary)/20 text-(--primary) hover:bg-(--primary)/5 hover:border-(--primary)/40 hover:-translate-y-0.5"
+                  >
+                    <Share2 className="w-4 h-4" />
+                    Share Case
+                  </button>
+                  <button
+                    onClick={handleUnsave}
+                    disabled={isRemoving}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold shadow-md transition-all bg-white border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 hover:shadow-red-500/10 hover:-translate-y-0.5 disabled:opacity-80 disabled:cursor-not-allowed"
+                  >
+                    {isRemoving ? (
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{
+                          duration: 1,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                        className="w-4 h-4 border-2 border-red-600/30 border-t-red-600 rounded-full"
+                      />
+                    ) : (
+                      <>
+                        <Trash2 className="w-4 h-4" />
+                        Unsave Dashboard
+                      </>
+                    )}
+                  </button>
+                </div>
               </CaseView>
+
+              <NotesSection
+                caseId={id!}
+                initialPersonalNote={caseData.personalNote}
+                initialSharedNotes={caseData.sharedNotes}
+              />
             </motion.div>
           )}
         </AnimatePresence>
       </main>
+
+      {id && (
+        <ShareModal
+          isOpen={isShareModalOpen}
+          onClose={() => setIsShareModalOpen(false)}
+          caseId={id}
+        />
+      )}
     </div>
   );
 }
