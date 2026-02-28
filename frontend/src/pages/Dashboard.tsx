@@ -272,13 +272,13 @@ export default function Dashboard() {
 
                     <div className="mb-6 flex-1">
                       <h3 className="text-lg font-serif-logo font-bold text-(--foreground) leading-tight mb-1 line-clamp-2">
-                        {c.parties?.[0]?.petName || "Petitioner"}
+                        {c.petName || "Petitioner"}
                       </h3>
                       <p className="text-[10px] text-(--color-sage) italic font-serif-logo my-1">
                         vs
                       </p>
                       <h3 className="text-lg font-serif-logo font-bold text-(--foreground) leading-tight line-clamp-2">
-                        {c.parties?.[0]?.resName || "Respondent"}
+                        {c.resName || "Respondent"}
                       </h3>
                     </div>
 
