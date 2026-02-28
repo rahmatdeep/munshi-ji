@@ -12,36 +12,83 @@ const router = Router();
 
 /**
  * POST /api/cases/fetch
- * Fetches case data from PHHC WITHOUT storing it in the database.
+ * Fetches case data from local DB if it exists, otherwise from PHHC.
+ * Returns `isSaved: true` if the case is in the DB AND saved by the requesting user.
  */
-router.post('/fetch', authMiddleware, async (req: AuthRequest, res: Response): Promise<Response | void> => {
+router.post(
+  "/fetch",
+  authMiddleware,
+  async (req: AuthRequest, res: Response): Promise<Response | void> => {
     const result = fetchCaseSchema.safeParse(req.body);
 
     if (!result.success) {
-        return res.status(400).json({ errors: result.error.issues });
+      return res.status(400).json({ errors: result.error.issues });
     }
+
+    const { case_type, case_no, case_year } = result.data;
+    const userId = req.user?.userId;
 
     try {
-        const caseData = await fetchPHHCCase(result.data);
+      // 1. Check local DB first
+      const localCase = await prisma.case.findUnique({
+        where: {
+          caseType_caseNo_caseYear: {
+            caseType: case_type,
+            caseNo: case_no,
+            caseYear: case_year,
+          },
+        },
+        include: {
+          parties: true,
+          hearings: true,
+          orders: true,
+          objections: true,
+          savedBy: {
+            where: { id: userId },
+            select: { id: true },
+          },
+        },
+      });
 
-        if (!caseData) {
-            return res.status(404).json({ error: 'Case not found on PHHC' });
-        }
+      if (localCase) {
+        // It exists locally. Check if the current user has saved it.
+        const isSaved = userId ? localCase.savedBy.length > 0 : false;
 
+        // Format to match the previous response wrapper
         return res.json({
-            message: 'Case data fetched successfully',
-            case: caseData,
+          message: "Case data fetched from local cache successfully",
+          case: localCase,
+          isSaved: isSaved,
+          caseId: localCase.id,
         });
+      }
+
+      // 2. Not in local DB, fetch from PHHC
+      const phhcData = await fetchPHHCCase(result.data);
+
+      if (!phhcData) {
+        return res.status(404).json({ error: "Case not found on PHHC" });
+      }
+
+      return res.json({
+        message: "Case data fetched from PHHC successfully",
+        case: phhcData,
+        isSaved: false,
+        caseId: null,
+      });
     } catch (error: any) {
-        console.error('PHHC fetch error:', error);
+      console.error("Fetch case error:", error);
 
-        if (error.message?.includes('PHHC API error')) {
-            return res.status(502).json({ error: 'Failed to fetch data from PHHC. Please try again later.' });
-        }
+      if (error.message?.includes("PHHC API error")) {
+        return res.status(502).json({
+          error: "Failed to fetch data from PHHC. Please try again later.",
+        });
+      }
 
-        return res.status(500).json({ error: 'Internal server error' });
+      return res.status(500).json({ error: "Internal server error" });
     }
-});
+  },
+);
 
 /**
  * POST /api/cases/save

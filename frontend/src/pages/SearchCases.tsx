@@ -13,6 +13,7 @@ import {
   Info,
   ChevronRight,
   Briefcase,
+  BookmarkMinus,
 } from "lucide-react";
 import CaseView from "../components/CaseView";
 
@@ -160,6 +161,8 @@ export default function SearchCases() {
   const [error, setError] = useState("");
   const [caseData, setCaseData] = useState<any>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [savedCaseId, setSavedCaseId] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const navigate = useNavigate();
 
@@ -193,6 +196,8 @@ export default function SearchCases() {
       );
 
       setCaseData(response.data.case);
+      setIsSaved(response.data.isSaved || false);
+      setSavedCaseId(response.data.caseId || null);
       setStatus("success");
       setSaveSuccess(false); // Reset save state on new search
     } catch (err: any) {
@@ -212,7 +217,7 @@ export default function SearchCases() {
     setIsSaving(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
+      const response = await axios.post(
         "http://localhost:3000/api/cases/save",
         {
           caseType: caseType,
@@ -225,6 +230,10 @@ export default function SearchCases() {
           },
         },
       );
+
+      const newCaseId = response.data.caseId;
+      setSavedCaseId(newCaseId);
+      setIsSaved(true);
       setSaveSuccess(true);
       // Automatically clear success message after 3 seconds
       setTimeout(() => setSaveSuccess(false), 3000);
@@ -232,6 +241,36 @@ export default function SearchCases() {
       console.error("Save error:", err);
       alert(
         err.response?.data?.error || "Failed to save case. Please try again.",
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleUnsaveCase = async () => {
+    if (!savedCaseId) return;
+
+    setIsSaving(true);
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        "http://localhost:3000/api/cases/unsave",
+        {
+          caseId: savedCaseId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      setIsSaved(false);
+      setSavedCaseId(null);
+    } catch (err: any) {
+      console.error("Unsave error:", err);
+      alert(
+        err.response?.data?.error || "Failed to unsave case. Please try again.",
       );
     } finally {
       setIsSaving(false);
@@ -493,37 +532,62 @@ export default function SearchCases() {
                   caseNo={caseNo}
                   caseYear={caseYear}
                 >
-                  <button
-                    onClick={handleSaveCase}
-                    disabled={isSaving || saveSuccess}
-                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold shadow-md transition-all ${
-                      saveSuccess
-                        ? "bg-green-600 hover:bg-green-700 text-white shadow-green-600/20"
-                        : "bg-(--primary) hover:bg-[#726242] text-(--primary-fg) shadow-(--primary)/20 hover:-translate-y-0.5"
-                    } disabled:opacity-80 disabled:cursor-not-allowed`}
-                  >
-                    {isSaving ? (
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{
-                          duration: 1,
-                          repeat: Infinity,
-                          ease: "linear",
-                        }}
-                        className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
-                      />
-                    ) : saveSuccess ? (
-                      <>
-                        <CheckCircle className="w-4 h-4" />
-                        Saved to Dashboard
-                      </>
-                    ) : (
-                      <>
-                        <Briefcase className="w-4 h-4" />
-                        Save Case
-                      </>
-                    )}
-                  </button>
+                  {isSaved ? (
+                    <button
+                      onClick={handleUnsaveCase}
+                      disabled={isSaving}
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold shadow-md transition-all bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 shadow-red-500/10 hover:-translate-y-0.5 disabled:opacity-80 disabled:cursor-not-allowed"
+                    >
+                      {isSaving ? (
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{
+                            duration: 1,
+                            repeat: Infinity,
+                            ease: "linear",
+                          }}
+                          className="w-4 h-4 border-2 border-red-200 border-t-red-600 rounded-full"
+                        />
+                      ) : (
+                        <>
+                          <BookmarkMinus className="w-4 h-4" />
+                          Unsave Case
+                        </>
+                      )}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleSaveCase}
+                      disabled={isSaving || saveSuccess}
+                      className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold shadow-md transition-all ${
+                        saveSuccess
+                          ? "bg-green-600 hover:bg-green-700 text-white shadow-green-600/20"
+                          : "bg-(--primary) hover:bg-[#726242] text-(--primary-fg) shadow-(--primary)/20 hover:-translate-y-0.5"
+                      } disabled:opacity-80 disabled:cursor-not-allowed`}
+                    >
+                      {isSaving ? (
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{
+                            duration: 1,
+                            repeat: Infinity,
+                            ease: "linear",
+                          }}
+                          className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+                        />
+                      ) : saveSuccess ? (
+                        <>
+                          <CheckCircle className="w-4 h-4" />
+                          Saved to Dashboard
+                        </>
+                      ) : (
+                        <>
+                          <Briefcase className="w-4 h-4" />
+                          Save Case
+                        </>
+                      )}
+                    </button>
+                  )}
                 </CaseView>
               </motion.div>
             )}
