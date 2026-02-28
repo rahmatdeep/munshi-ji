@@ -5,6 +5,7 @@ import { fetchCaseSchema } from '../types/phhc';
 import { saveCaseSchema, unsaveCaseSchema, shareCaseSchema } from '../types/savedCase';
 import prisma from '../lib/prisma';
 import { sendShareCaseEmail } from '../lib/mail';
+import { personalNoteSchema, sharedNoteSchema } from '../types/note';
 
 const router = Router();
 
@@ -197,6 +198,9 @@ router.get('/saved', authMiddleware, async (req: AuthRequest, res: Response): Pr
                         hearings: true,
                         orders: true,
                         objections: true,
+                        personalNotes: {
+                            where: { userId: userId }
+                        }
                     },
                     orderBy: {
                         updatedAt: 'desc'
@@ -205,8 +209,14 @@ router.get('/saved', authMiddleware, async (req: AuthRequest, res: Response): Pr
             }
         });
 
+        const savedCases = (userWithCases?.savedCases as any[] || []).map((c: any) => ({
+            ...c,
+            personalNote: c.personalNotes?.[0] || null,
+            personalNotes: undefined // Remove the array
+        }));
+
         return res.json({
-            savedCases: userWithCases?.savedCases || []
+            savedCases: savedCases
         });
     } catch (error) {
         console.error('Fetch saved cases error:', error);
@@ -222,6 +232,8 @@ router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response): Prom
     const id = req.params.id as string;
 
     try {
+        const userId = req.user?.userId;
+
         const caseDetails = await prisma.case.findUnique({
             where: { id },
             include: {
@@ -229,6 +241,19 @@ router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response): Prom
                 hearings: true,
                 orders: true,
                 objections: true,
+                sharedNotes: {
+                    include: {
+                        user: {
+                            select: { name: true, email: true }
+                        }
+                    },
+                    orderBy: {
+                        createdAt: 'desc'
+                    }
+                },
+                personalNotes: userId ? {
+                    where: { userId }
+                } : undefined
             }
         });
 
@@ -236,7 +261,14 @@ router.get('/:id', authMiddleware, async (req: AuthRequest, res: Response): Prom
             return res.status(404).json({ error: 'Case not found' });
         }
 
-        return res.json({ case: caseDetails });
+        // Flatten personal note
+        const responseData = {
+            ...caseDetails,
+            personalNote: (caseDetails as any).personalNotes?.[0] || null,
+            personalNotes: undefined
+        };
+
+        return res.json({ case: responseData });
     } catch (error) {
         console.error('Fetch case by ID error:', error);
         return res.status(500).json({ error: 'Internal server error' });
@@ -285,6 +317,125 @@ router.post('/share', authMiddleware, async (req: AuthRequest, res: Response): P
         return res.json({ message: 'Case shared successfully' });
     } catch (error) {
         console.error('Case share error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+/**
+ * PATCH /api/cases/:id/personal-note
+ * Upserts a private note for the user on this case.
+ */
+router.patch('/:id/personal-note', authMiddleware, async (req: AuthRequest, res: Response): Promise<Response | void> => {
+    const caseId = req.params.id;
+    const userId = req.user?.userId;
+    const result = personalNoteSchema.safeParse(req.body);
+
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+    if (!result.success) return res.status(400).json({ errors: result.error.issues });
+
+    try {
+        const note = await prisma.personalNote.upsert({
+            where: {
+                userId_caseId: { userId, caseId }
+            },
+            create: {
+                userId,
+                caseId,
+                content: result.data.content
+            },
+            update: {
+                content: result.data.content
+            }
+        });
+
+        return res.json({ message: 'Personal note saved', note });
+    } catch (error) {
+        console.error('Personal note error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+/**
+ * DELETE /api/cases/:id/personal-note
+ * Deletes the user's private note for this case.
+ */
+router.delete('/:id/personal-note', authMiddleware, async (req: AuthRequest, res: Response): Promise<Response | void> => {
+    const caseId = req.params.id;
+    const userId = req.user?.userId;
+
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+    try {
+        await prisma.personalNote.delete({
+            where: {
+                userId_caseId: { userId, caseId }
+            }
+        });
+        return res.json({ message: 'Personal note deleted' });
+    } catch (error) {
+        console.error('Delete personal note error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+/**
+ * POST /api/cases/:id/shared-notes
+ * Adds a new entry to the shared history log.
+ */
+router.post('/:id/shared-notes', authMiddleware, async (req: AuthRequest, res: Response): Promise<Response | void> => {
+    const caseId = req.params.id;
+    const userId = req.user?.userId;
+    const result = sharedNoteSchema.safeParse(req.body);
+
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+    if (!result.success) return res.status(400).json({ errors: result.error.issues });
+
+    try {
+        const sharedNote = await prisma.sharedNote.create({
+            data: {
+                userId,
+                caseId,
+                content: result.data.content
+            },
+            include: {
+                user: {
+                    select: { name: true, email: true }
+                }
+            }
+        });
+
+        return res.status(201).json({ message: 'Shared note added', sharedNote });
+    } catch (error) {
+        console.error('Add shared note error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+/**
+ * DELETE /api/cases/:id/shared-notes/:noteId
+ * Deletes a shared note entry (Only if user is the author).
+ */
+router.delete('/:id/shared-notes/:noteId', authMiddleware, async (req: AuthRequest, res: Response): Promise<Response | void> => {
+    const noteId = req.params.noteId;
+    const userId = req.user?.userId;
+
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+    try {
+        const note = await prisma.sharedNote.findUnique({
+            where: { id: noteId }
+        });
+
+        if (!note) return res.status(404).json({ error: 'Note not found' });
+        if (note.userId !== userId) return res.status(403).json({ error: 'Only the author can delete this note' });
+
+        await prisma.sharedNote.delete({
+            where: { id: noteId }
+        });
+
+        return res.json({ message: 'Shared note deleted' });
+    } catch (error) {
+        console.error('Delete shared note error:', error);
         return res.status(500).json({ error: 'Internal server error' });
     }
 });

@@ -19,14 +19,16 @@ enum Role {
 }
 
 model User {
-  id         String      @id @default(uuid())
-  email      String      @unique
-  name       String?
-  role       Role        @default(USER)
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  magicToken MagicToken?
-  savedCases Case[]
+  id            String         @id @default(uuid())
+  email         String         @unique
+  name          String?
+  role          Role           @default(USER)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  magicToken    MagicToken?
+  savedCases    Case[]
+  personalNotes PersonalNote[]
+  sharedNotes   SharedNote[]
 }
 
 model MagicToken {
@@ -61,15 +63,16 @@ model Case {
   nextListingDate DateTime?
   disposalDate    DateTime?
   disposalType    String?
-
   // Raw JSON blob from the API for any extra fields
-  rawData Json?
+  rawData         Json?
 
-  parties    CaseParty[]
-  hearings   CaseHearing[]
-  orders     CaseOrder[]
-  objections CaseObjection[]
-  savedBy    User[]
+  parties       CaseParty[]
+  hearings      CaseHearing[]
+  orders        CaseOrder[]
+  objections    CaseObjection[]
+  savedBy       User[]
+  personalNotes PersonalNote[]
+  sharedNotes   SharedNote[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -132,5 +135,30 @@ model CaseObjection {
   caseId    String
   case      Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
   rawData   Json // Store the entire objection object
+  createdAt DateTime @default(now())
+}
+
+model PersonalNote {
+  id      String @id @default(uuid())
+  content String
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  caseId  String
+  case    Case   @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, caseId])
+}
+
+model SharedNote {
+  id      String @id @default(uuid())
+  content String
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  caseId  String
+  case    Case   @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
 }
