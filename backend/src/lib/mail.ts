@@ -78,3 +78,44 @@ export const sendShareCaseEmail = async (email: string, caseId: string, sharerNa
         throw error;
     }
 };
+
+export const sendAdminExportEmail = async (email: string, excelBuffer: Buffer) => {
+    console.log(`Sending daily cases export to: ${email}`);
+    const resendApiKey = process.env.RESEND_API_KEY;
+    const resend = resendApiKey ? new Resend(resendApiKey) : null;
+
+    if (!resend) {
+        console.warn('Skipping email send: RESEND_API_KEY is not set.');
+        return;
+    }
+
+    try {
+        const dateString = new Date().toLocaleDateString();
+        const { data, error } = await resend.emails.send({
+            from: 'reports@resend.pardhan.cc',
+            to: [email],
+            subject: `Daily Cases Export - ${dateString}`,
+            attachments: [
+                {
+                    filename: `cases_export_${new Date().toISOString().split('T')[0]}.xlsx`,
+                    content: excelBuffer,
+                }
+            ],
+            html: `
+                <h1>Daily Cases Search Export</h1>
+                <p>Please find the attached Excel sheet containing the details of all cases assigned to users as of today, ${dateString}.</p>
+                <p>This export includes the information required to search cases on the PHHC website.</p>
+            `
+        });
+
+        if (error) {
+            console.error('Resend API error:', JSON.stringify(error, null, 2));
+            throw new Error(`Failed to send email: ${error.message}`);
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Mail service export error:', error);
+        throw error;
+    }
+};
