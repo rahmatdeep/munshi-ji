@@ -34,19 +34,39 @@ router.post(
         return res.status(404).json({ error: "Case not found on PHHC" });
       }
 
+      // Check if the case is already saved by this user
+      const savedCase = await prisma.case.findUnique({
+        where: {
+          caseType_caseNo_caseYear: {
+            caseType: result.data.case_type,
+            caseNo: result.data.case_no,
+            caseYear: result.data.case_year,
+          },
+        },
+        select: {
+          id: true,
+          savedBy: {
+            where: { id: req.user?.userId },
+            select: { id: true },
+          },
+        },
+      });
+
+      const isSaved = !!(savedCase && savedCase.savedBy.length > 0);
+
       return res.json({
         message: "Case data fetched successfully",
         case: caseData,
+        isSaved,
+        caseId: savedCase?.id || null,
       });
     } catch (error: any) {
       console.error("PHHC fetch error:", error);
 
       if (error.message?.includes("PHHC API error")) {
-        return res
-          .status(502)
-          .json({
-            error: "Failed to fetch data from PHHC. Please try again later.",
-          });
+        return res.status(502).json({
+          error: "Failed to fetch data from PHHC. Please try again later.",
+        });
       }
 
       return res.status(500).json({ error: "Internal server error" });
