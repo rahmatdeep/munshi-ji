@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import CaseView from "../components/CaseView";
 import ShareModal from "../components/ShareModal";
+import NotesSection from "../components/NotesSection";
 
 const VALID_CASE_TYPES = [
   "CWP",
@@ -602,6 +603,15 @@ export default function SearchCases() {
                     </button>
                   )}
                 </CaseView>
+
+                {savedCaseId && (
+                  <NotesSection
+                    caseId={savedCaseId}
+                    initialPersonalNote={caseData.personalNote || null}
+                    initialSharedNotes={caseData.sharedNotes || []}
+                    isSaved={isSaved}
+                  />
+                )}
               </motion.div>
             )}
           </AnimatePresence>

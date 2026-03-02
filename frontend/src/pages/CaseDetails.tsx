@@ -291,6 +291,7 @@ export default function CaseDetails() {
                 caseId={id!}
                 initialPersonalNote={caseData.personalNote}
                 initialSharedNotes={caseData.sharedNotes}
+                isSaved={isSaved}
               />
             </motion.div>
           )}

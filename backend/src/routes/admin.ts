@@ -31,29 +31,28 @@ router.post(
 
 /**
  * GET /api/admin/users
- * Lists all registered users in the system.
- * Restricted to ADMIN role.
+ * Lists users. Admins get full details, standard users get basic info for sharing.
  */
 router.get(
   "/users",
   authMiddleware,
   async (req: AuthRequest, res: Response): Promise<Response | void> => {
-    // Role check
-    if (req.user?.role !== "ADMIN") {
-      return res.status(403).json({ error: "Forbidden: Admin access only" });
-    }
-
     try {
+      const isAdmin = req.user?.role === "ADMIN";
+
       const users = await prisma.user.findMany({
-        orderBy: { createdAt: "desc" },
+        orderBy: isAdmin ? { createdAt: "desc" } : { name: "asc" },
         select: {
           id: true,
           email: true,
           name: true,
-          role: true,
-          createdAt: true,
+          ...(isAdmin && {
+            role: true,
+            createdAt: true,
+          }),
         },
       });
+
       return res.json({ users });
     } catch (error) {
       console.error("Fetch users error:", error);

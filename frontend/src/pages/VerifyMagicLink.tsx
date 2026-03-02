@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -19,28 +20,29 @@ export default function VerifyMagicLink() {
 
     const token = searchParams.get("token");
 
-    if (!token) {
-      setStatus("error");
-      setErrorMessage("No token provided. Please request a new magic link.");
-      return;
-    }
-
     const verifyToken = async () => {
+      if (!token) {
+        setStatus("error");
+        setErrorMessage("No token provided. Please request a new magic link.");
+        return;
+      }
+
       try {
         const response = await axios.post(
           `${API_URL}/api/auth/verify-magic-link`,
           { token },
         );
-        const { token: jwtToken } = response.data;
+        const { token: jwtToken, user } = response.data;
 
-        // Store the JWT
+        // Store the JWT and user essentials
         localStorage.setItem("token", jwtToken);
+        localStorage.setItem("user", JSON.stringify(user));
 
         setStatus("success");
 
         // Redirect to dashboard after a brief moment
         setTimeout(() => {
-          navigate("/");
+          navigate("/dashboard");
         }, 2000);
       } catch (err: any) {
         console.error("Verification error:", err);

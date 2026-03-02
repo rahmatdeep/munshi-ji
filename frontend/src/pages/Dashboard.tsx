@@ -24,8 +24,21 @@ export default function Dashboard() {
   const [savedCases, setSavedCases] = useState<any[]>([]);
   const navigate = useNavigate();
 
+  const [currentUser] = useState<any>(() => {
+    const userJson = localStorage.getItem("user");
+    if (userJson) {
+      try {
+        return JSON.parse(userJson);
+      } catch (e) {
+        console.error("Dashboard user parse error:", e);
+      }
+    }
+    return null;
+  });
+
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     navigate("/", { replace: true });
   };
 
@@ -120,23 +133,21 @@ export default function Dashboard() {
 
         <div className="flex items-center gap-4">
           <AnimatePresence>
-            {localStorage.getItem("token") &&
-              JSON.parse(atob(localStorage.getItem("token")!.split(".")[1]))
-                .role === "ADMIN" && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  key="admin-users"
+            {currentUser?.role === "ADMIN" && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                key="admin-users"
+              >
+                <button
+                  onClick={() => navigate("/admin/users")}
+                  className="flex items-center gap-2 text-sm font-semibold text-amber-600 transition-all px-4 py-2 rounded-full hover:bg-amber-50 border border-transparent hover:border-amber-200"
                 >
-                  <button
-                    onClick={() => navigate("/admin/users")}
-                    className="flex items-center gap-2 text-sm font-semibold text-amber-600 transition-all px-4 py-2 rounded-full hover:bg-amber-50 border border-transparent hover:border-amber-200"
-                  >
-                    <Users className="w-4 h-4" />
-                    <span className="hidden sm:inline">Manage Users</span>
-                  </button>
-                </motion.div>
-              )}
+                  <Users className="w-4 h-4" />
+                  <span className="hidden sm:inline">Manage Users</span>
+                </button>
+              </motion.div>
+            )}
           </AnimatePresence>
 
           <motion.div
@@ -273,17 +284,14 @@ export default function Dashboard() {
                     <Search className="w-5 h-5" />
                     Begin New Search
                   </button>
-                  {localStorage.getItem("token") &&
-                    JSON.parse(
-                      atob(localStorage.getItem("token")!.split(".")[1]),
-                    ).role === "ADMIN" && (
-                      <button
-                        onClick={() => navigate("/admin/users")}
-                        className="w-full sm:w-auto text-sm font-bold text-(--primary) border-2 border-(--primary)/20 py-4 px-8 rounded-2xl hover:bg-(--primary)/5 transition-all"
-                      >
-                        Invite Colleagues
-                      </button>
-                    )}
+                  {currentUser?.role === "ADMIN" && (
+                    <button
+                      onClick={() => navigate("/admin/users")}
+                      className="w-full sm:w-auto text-sm font-bold text-(--primary) border-2 border-(--primary)/20 py-4 px-8 rounded-2xl hover:bg-(--primary)/5 transition-all"
+                    >
+                      Invite Colleagues
+                    </button>
+                  )}
                 </div>
               </motion.div>
             )}

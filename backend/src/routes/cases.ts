@@ -34,7 +34,7 @@ router.post(
         return res.status(404).json({ error: "Case not found on PHHC" });
       }
 
-      // Check if the case is already saved by this user
+      // Check if the case is already saved by this user and get notes if so
       const savedCase = await prisma.case.findUnique({
         where: {
           caseType_caseNo_caseYear: {
@@ -43,11 +43,21 @@ router.post(
             caseYear: result.data.case_year,
           },
         },
-        select: {
-          id: true,
+        include: {
           savedBy: {
             where: { id: req.user?.userId },
             select: { id: true },
+          },
+          personalNotes: {
+            where: { userId: req.user?.userId },
+          },
+          sharedNotes: {
+            include: {
+              user: {
+                select: { name: true, email: true },
+              },
+            },
+            orderBy: { createdAt: "asc" },
           },
         },
       });
@@ -56,7 +66,11 @@ router.post(
 
       return res.json({
         message: "Case data fetched successfully",
-        case: caseData,
+        case: {
+          ...caseData,
+          personalNote: savedCase?.personalNotes?.[0] || null,
+          sharedNotes: savedCase?.sharedNotes || [],
+        },
         isSaved,
         caseId: savedCase?.id || null,
       });
@@ -358,7 +372,7 @@ router.post(
       return res.status(400).json({ errors: result.error.issues });
     }
 
-    const { caseId, recipientEmail } = result.data;
+    const { caseId, recipientEmails } = result.data;
     const userId = req.user?.userId;
 
     if (!userId) {
@@ -383,8 +397,12 @@ router.post(
 
       const sharerName = user?.name || user?.email || "A user";
 
-      // 3. Send email via Resend
-      await sendShareCaseEmail(recipientEmail, caseId, sharerName);
+      // 3. Send emails via Resend in parallel
+      await Promise.all(
+        recipientEmails.map((email) =>
+          sendShareCaseEmail(email, caseId, sharerName),
+        ),
+      );
 
       return res.json({ message: "Case shared successfully" });
     } catch (error) {

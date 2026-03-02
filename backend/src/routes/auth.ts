@@ -125,6 +125,7 @@ router.post(
       return res.json({
         message: "Login successful",
         token: jwtToken,
+        user: payload,
       });
     } catch (error) {
       console.error("Magic link verification error:", error);

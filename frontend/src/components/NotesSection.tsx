@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { API_URL } from "../lib/api";
 import { motion } from "framer-motion";
@@ -27,12 +27,14 @@ interface NotesSectionProps {
   caseId: string;
   initialPersonalNote: Note | null;
   initialSharedNotes: Note[];
+  isSaved: boolean;
 }
 
 export default function NotesSection({
   caseId,
   initialPersonalNote,
   initialSharedNotes,
+  isSaved,
 }: NotesSectionProps) {
   const [personalContent, setPersonalContent] = useState(
     initialPersonalNote?.content || "",
@@ -47,33 +49,21 @@ export default function NotesSection({
   const [error, setError] = useState("");
 
   // Get current user ID to determine which shared notes can be deleted
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
+  const [currentUserId] = useState<string | null>(() => {
+    const userJson = localStorage.getItem("user");
+    if (userJson) {
       try {
-        const base64Url = token.split(".")[1];
-        const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-        const jsonPayload = decodeURIComponent(
-          window
-            .atob(base64)
-            .split("")
-            .map(function (c) {
-              return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-            })
-            .join(""),
-        );
-
-        const decoded = JSON.parse(jsonPayload);
-        setCurrentUserId(decoded.userId);
+        const user = JSON.parse(userJson);
+        return user.userId;
       } catch (e) {
-        console.error("Failed to decode token", e);
+        console.error("Failed to parse user from localStorage", e);
       }
     }
-  }, []);
+    return null;
+  });
 
   const handleSavePersonalNote = async () => {
+    if (!isSaved) return;
     setIsSavingPersonal(true);
     setError("");
     try {
@@ -83,7 +73,6 @@ export default function NotesSection({
         { content: personalContent },
         { headers: { Authorization: `Bearer ${token}` } },
       );
-      // Briefly show success state if needed
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         setError(err.response?.data?.error || "Failed to save personal note");
@@ -96,6 +85,7 @@ export default function NotesSection({
   };
 
   const handleClearPersonalNote = async () => {
+    if (!isSaved) return;
     if (!personalContent && !initialPersonalNote) return;
     if (!confirm("Are you sure you want to delete your personal note?")) return;
 
@@ -120,7 +110,7 @@ export default function NotesSection({
 
   const handlePostSharedNote = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newSharedContent.trim()) return;
+    if (!isSaved || !newSharedContent.trim()) return;
 
     setIsPostingShared(true);
     setError("");
@@ -145,6 +135,7 @@ export default function NotesSection({
   };
 
   const handleDeleteSharedNote = async (noteId: string) => {
+    if (!isSaved) return;
     if (!confirm("Delete this shared note?")) return;
 
     try {
@@ -164,51 +155,61 @@ export default function NotesSection({
   };
 
   return (
-    <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8 relative pb-20">
       {error && (
-        <div className="col-span-1 lg:col-span-2 flex items-center gap-2 p-4 bg-red-50 text-red-600 rounded-xl border border-red-100">
+        <div className="col-span-1 lg:col-span-2 flex items-center gap-2 p-4 bg-red-50 text-red-600 rounded-xl border border-red-100 mb-4">
           <AlertCircle className="w-5 h-5" />
           <p className="text-sm font-semibold">{error}</p>
         </div>
       )}
 
-      {/* Personal Notes Section */}
-      <div className="glass-card bg-white/40 p-6 md:p-8 rounded-3xl border border-(--color-tan)/30 shadow-xl shadow-(--color-sage)/5 flex flex-col h-125">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-[#6B5A3A]/10 flex items-center justify-center border border-[#6B5A3A]/20">
-            <FileText className="w-5 h-5 text-[#6B5A3A]" />
+      <div className="glass-card bg-white/40 p-6 md:p-8 rounded-3xl border border-(--color-tan)/30 shadow-2xl shadow-(--color-sage)/5 flex flex-col h-125 relative overflow-hidden group">
+        <div className="flex items-center gap-3 mb-6 relative z-10">
+          <div className="w-12 h-12 rounded-2xl bg-[#6B5A3A]/10 flex items-center justify-center border border-[#6B5A3A]/20 shadow-inner">
+            <FileText className="w-6 h-6 text-[#6B5A3A]" />
           </div>
           <div>
-            <h3 className="font-serif-logo font-bold text-xl text-(--foreground)">
-              Personal Notes
+            <h3 className="font-serif-logo font-bold text-2xl text-(--foreground) tracking-tight">
+              Personal Notepad
             </h3>
-            <p className="text-xs text-(--color-sage) font-medium">
-              Private to you. Not shared with others.
+            <p className="text-[10px] text-(--color-sage) font-black uppercase tracking-widest">
+              Private Workspace
             </p>
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col relative group">
+        <div className="flex-1 flex flex-col relative group/textarea z-10">
+          <div className="absolute top-0 left-0 w-1 h-full bg-linear-to-b from-red-200/40 via-red-200/20 to-red-200/40 rounded-full ml-1" />
           <textarea
             value={personalContent}
             onChange={(e) => setPersonalContent(e.target.value)}
-            placeholder="Type your private case notes, strategies, or reminders here..."
-            className="w-full flex-1 resize-none bg-white/60 border-2 border-(--color-tan)/50 rounded-2xl p-5 text-sm leading-relaxed text-(--foreground) outline-none focus:border-(--color-brown) focus:ring-4 focus:ring-(--color-brown)/10 transition-all placeholder:text-(--color-sage)/70"
+            disabled={!isSaved}
+            placeholder={
+              isSaved
+                ? "Draft your private notes, strategies, or reminders here..."
+                : ""
+            }
+            className={`w-full flex-1 resize-none bg-white/60 border-2 border-(--color-tan)/30 rounded-2xl p-6 pl-10 text-base leading-loose text-(--foreground) outline-none focus:border-(--color-brown) focus:ring-8 focus:ring-(--color-brown)/5 transition-all placeholder:text-(--color-sage)/50 font-medium ${!isSaved ? "cursor-not-allowed opacity-50" : ""}`}
+            style={{
+              backgroundImage: "linear-gradient(#f1eee0 1px, transparent 1px)",
+              backgroundSize: "100% 2.5rem",
+              lineHeight: "2.5rem",
+            }}
           />
         </div>
 
-        <div className="flex justify-end gap-3 mt-4">
+        <div className="flex justify-end gap-3 mt-6 relative z-10">
           <button
             onClick={handleClearPersonalNote}
-            disabled={!personalContent || isSavingPersonal}
-            className="px-4 py-2.5 rounded-xl text-sm font-bold text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50 flex items-center gap-2"
+            disabled={!personalContent || isSavingPersonal || !isSaved}
+            className="px-5 py-2.5 rounded-xl text-sm font-bold text-red-600 hover:bg-red-50 transition-all disabled:opacity-30 flex items-center gap-2 active:scale-95"
           >
-            <Trash2 className="w-4 h-4" /> Clear
+            <Trash2 className="w-4 h-4" /> Reset
           </button>
           <button
             onClick={handleSavePersonalNote}
-            disabled={isSavingPersonal}
-            className="px-6 py-2.5 rounded-xl text-sm font-bold bg-(--primary) text-white hover:bg-[#726242] transition-colors shadow-lg shadow-(--primary)/20 disabled:opacity-70 flex items-center gap-2"
+            disabled={isSavingPersonal || !isSaved}
+            className="px-8 py-2.5 rounded-xl text-sm font-bold bg-(--primary) text-white hover:bg-[#726242] transition-all shadow-xl shadow-(--primary)/20 disabled:opacity-30 flex items-center gap-2 active:scale-95"
           >
             {isSavingPersonal ? (
               <motion.div
@@ -218,75 +219,105 @@ export default function NotesSection({
               />
             ) : (
               <>
-                <Save className="w-4 h-4" /> Save Notes
+                <Save className="w-4 h-4" /> Secure Save
               </>
             )}
           </button>
         </div>
+
+        {!isSaved && (
+          <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px] z-20 flex items-center justify-center p-8 text-center">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="glass-card bg-white p-6 rounded-2xl shadow-2xl border border-(--color-tan)/40"
+            >
+              <div className="w-12 h-12 bg-(--primary)/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Save className="w-6 h-6 text-(--primary)" />
+              </div>
+              <p className="text-sm font-bold text-(--foreground) mb-1">
+                Personal Notepad Locked
+              </p>
+              <p className="text-xs text-(--color-sage) font-medium">
+                Save this case to start drafting private notes.
+              </p>
+            </motion.div>
+          </div>
+        )}
       </div>
 
-      {/* Shared Notes Section */}
-      <div className="glass-card bg-white/40 p-6 md:p-8 rounded-3xl border border-(--color-tan)/30 shadow-xl shadow-(--color-sage)/5 flex flex-col h-125">
-        <div className="flex items-center gap-3 mb-6 shrink-0">
-          <div className="w-10 h-10 rounded-xl bg-(--primary)/10 flex items-center justify-center border border-(--primary)/20">
-            <Users className="w-5 h-5 text-(--primary)" />
+      <div className="glass-card bg-white/40 p-6 md:p-8 rounded-3xl border border-(--color-tan)/30 shadow-2xl shadow-(--color-sage)/5 flex flex-col h-125 relative overflow-hidden group">
+        <div className="flex items-center gap-3 mb-6 relative z-10">
+          <div className="w-12 h-12 rounded-2xl bg-(--primary)/10 flex items-center justify-center border border-(--primary)/20 shadow-inner">
+            <Users className="w-6 h-6 text-(--primary)" />
           </div>
           <div>
-            <h3 className="font-serif-logo font-bold text-xl text-(--foreground)">
+            <h3 className="font-serif-logo font-bold text-2xl text-(--foreground) tracking-tight">
               Collaborative Insights
             </h3>
-            <p className="text-xs text-(--color-sage) font-medium">
-              Share updates and notes with everyone who has saved this case.
+            <p className="text-[10px] text-(--color-sage) font-black uppercase tracking-widest">
+              Team Intelligence
             </p>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto pr-2 space-y-4 mb-4 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto pr-2 space-y-4 mb-4 custom-scrollbar relative z-10">
           {sharedNotes.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center opacity-60">
-              <MessageSquare className="w-12 h-12 text-(--color-sage) mb-3" />
-              <p className="text-sm font-medium text-(--foreground)">
-                No discussions yet.
+            <div className="h-full flex flex-col items-center justify-center text-center opacity-40">
+              <MessageSquare className="w-16 h-16 text-(--color-sage) mb-4" />
+              <p className="text-sm font-bold text-(--foreground)">
+                The record is clear.
               </p>
-              <p className="text-xs text-(--color-sage) mt-1 max-w-50">
-                Be the first to share an insight or question about this case.
+              <p className="text-xs text-(--color-sage) mt-1 max-w-50 font-medium font-sans">
+                Be the first to share an insight with the team.
               </p>
             </div>
           ) : (
             sharedNotes.map((note) => {
               const isAuthor = note.userId === currentUserId;
               return (
-                <div
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
                   key={note.id}
-                  className={`p-4 rounded-2xl text-sm ${isAuthor ? "bg-(--primary)/5 border border-(--primary)/20 ml-8" : "bg-white border border-(--color-tan)/40 mr-8"}`}
+                  className={`p-5 rounded-2xl ${isAuthor ? "bg-(--primary)/5 border border-(--primary)/10 ml-10" : "bg-white border border-(--color-tan)/30 mr-10"} shadow-sm transition-all hover:shadow-md`}
                 >
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <span className="font-bold text-(--foreground)">
-                        {note.user?.name || note.user?.email || "Unknown User"}
-                      </span>
-                      <span className="text-[10px] text-(--color-sage) ml-2">
-                        {new Date(note.createdAt).toLocaleDateString()}{" "}
-                        {new Date(note.createdAt).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </span>
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${isAuthor ? "bg-(--primary) text-white" : "bg-(--color-tan) text-(--primary)"}`}
+                      >
+                        {(note.user?.name ||
+                          note.user?.email ||
+                          "U")[0].toUpperCase()}
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-xs font-black text-(--foreground) leading-none">
+                          {note.user?.name || note.user?.email}
+                        </span>
+                        <span className="text-[9px] text-(--color-sage) font-bold uppercase tracking-tighter mt-0.5">
+                          {new Date(note.createdAt).toLocaleDateString()} at{" "}
+                          {new Date(note.createdAt).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      </div>
                     </div>
-                    {isAuthor && (
+                    {isAuthor && isSaved && (
                       <button
                         onClick={() => handleDeleteSharedNote(note.id)}
-                        className="text-red-400 hover:text-red-600 transition-colors"
-                        title="Delete note"
+                        className="text-(--color-sage) hover:text-red-500 transition-colors p-1"
+                        title="Remove entry"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     )}
                   </div>
-                  <p className="text-(--foreground) whitespace-pre-wrap">
+                  <p className="text-sm font-medium text-(--foreground) leading-relaxed whitespace-pre-wrap font-sans">
                     {note.content}
                   </p>
-                </div>
+                </motion.div>
               );
             })
           )}
@@ -294,31 +325,56 @@ export default function NotesSection({
 
         <form
           onSubmit={handlePostSharedNote}
-          className="shrink-0 mt-auto relative"
+          className="shrink-0 mt-auto relative z-10"
         >
-          <input
-            type="text"
-            value={newSharedContent}
-            onChange={(e) => setNewSharedContent(e.target.value)}
-            placeholder="Type a message..."
-            className="w-full bg-white/80 border-2 border-(--color-tan)/50 rounded-xl pl-4 pr-12 py-3 text-sm font-medium text-(--foreground) outline-none focus:border-(--primary) transition-colors"
-          />
-          <button
-            type="submit"
-            disabled={!newSharedContent.trim() || isPostingShared}
-            className="absolute right-2 top-2 p-1.5 bg-(--primary) text-white rounded-lg hover:bg-[#726242] disabled:opacity-50 transition-colors"
-          >
-            {isPostingShared ? (
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
-              />
-            ) : (
-              <Send className="w-4 h-4" />
-            )}
-          </button>
+          <div className="relative group">
+            <input
+              type="text"
+              value={newSharedContent}
+              onChange={(e) => setNewSharedContent(e.target.value)}
+              disabled={!isSaved}
+              placeholder={
+                isSaved ? "Contribute to the legal strategy..." : "Locked"
+              }
+              className={`w-full bg-white/80 border-2 border-(--color-tan)/50 rounded-3xl pl-6 pr-14 py-4 text-sm font-bold text-(--foreground) outline-none focus:border-(--primary) focus:ring-8 focus:ring-(--primary)/5 transition-all placeholder:text-(--color-sage)/40 ${!isSaved ? "cursor-not-allowed opacity-50" : ""}`}
+            />
+            <button
+              type="submit"
+              disabled={!newSharedContent.trim() || isPostingShared || !isSaved}
+              className="absolute right-2.5 top-2.5 p-2 bg-(--primary) text-white rounded-xl hover:bg-[#726242] disabled:opacity-20 transition-all shadow-lg active:scale-90"
+            >
+              {isPostingShared ? (
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
+                />
+              ) : (
+                <Send className="w-5 h-5 translate-x-0.5 -translate-y-0.5" />
+              )}
+            </button>
+          </div>
         </form>
+
+        {!isSaved && (
+          <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px] z-20 flex items-center justify-center p-8 text-center">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="glass-card bg-white p-6 rounded-2xl shadow-2xl border border-(--color-tan)/40"
+            >
+              <div className="w-12 h-12 bg-(--primary)/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Users className="w-6 h-6 text-(--primary)" />
+              </div>
+              <p className="text-sm font-bold text-(--foreground) mb-1">
+                Collaboration Locked
+              </p>
+              <p className="text-xs text-(--color-sage) font-medium">
+                Save this case to join the discussion board.
+              </p>
+            </motion.div>
+          </div>
+        )}
       </div>
     </div>
   );

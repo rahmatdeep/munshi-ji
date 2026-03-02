@@ -23,7 +23,7 @@ export const saveCaseSchema = z
 
 export const shareCaseSchema = z.object({
   caseId: z.string().uuid("Invalid case ID"),
-  recipientEmail: z.string().email("Invalid recipient email"),
+  recipientEmails: z.array(z.string().email("Invalid recipient email")),
 });
 
 export const unsaveCaseSchema = z.object({
