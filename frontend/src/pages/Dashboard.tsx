@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 import {
   Search,
   LogOut,
-  FileText,
   Calendar,
   Hash,
   CheckCircle,
@@ -240,28 +239,47 @@ export default function Dashboard() {
             {status === "empty" && (
               <motion.div
                 key="empty"
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                className="text-center max-w-md mx-auto my-auto glass-card rounded-3xl p-10 bg-white/30 border-white/50"
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="text-center max-w-2xl mx-auto my-auto py-12 px-6"
               >
-                <div className="w-20 h-20 rounded-2xl bg-(--color-tan)/20 border-2 border-(--color-tan)/30 flex items-center justify-center mx-auto mb-6">
-                  <FileText className="w-10 h-10 text-(--color-sage)" />
+                <div className="relative mb-8 flex justify-center">
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.2, type: "spring" }}
+                    className="w-24 h-24 rounded-3xl bg-linear-to-br from-white to-(--color-tan)/30 border border-white shadow-2xl shadow-(--primary)/5 flex items-center justify-center relative z-10"
+                  >
+                    <Briefcase className="w-10 h-10 text-(--primary)" />
+                  </motion.div>
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-(--primary)/5 rounded-full blur-3xl" />
                 </div>
-                <h3 className="text-xl font-serif-logo font-bold text-(--foreground) mb-2">
-                  No Saved Cases
+
+                <h3 className="text-3xl font-serif-logo font-bold text-(--foreground) mb-4 tracking-tight">
+                  Your Legal Command Center Awaits
                 </h3>
-                <p className="text-sm font-medium text-(--muted-fg) leading-relaxed mb-8">
-                  You haven't saved any cases to your dashboard yet. Search for
-                  cases and save them to track updates.
+                <p className="text-base font-medium text-(--color-sage) leading-relaxed mb-10 max-w-lg mx-auto">
+                  Your dashboard is currently an open brief. Start by searching
+                  for active cases to track their status, collaborate with your
+                  team, and organize your litigation strategy.
                 </p>
-                <button
-                  onClick={() => navigate("/search")}
-                  className="w-full flex justify-center items-center gap-2 py-3.5 px-6 rounded-xl shadow-lg shadow-(--primary)/20 text-sm font-bold text-(--primary-fg) bg-(--primary) hover:bg-[#726242] transition-all"
-                >
-                  <Search className="w-4 h-4" />
-                  Search Cases
-                </button>
+
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                  <button
+                    onClick={() => navigate("/search")}
+                    className="w-full sm:w-auto min-w-50 flex justify-center items-center gap-3 py-4 px-8 rounded-2xl shadow-xl shadow-(--primary)/20 text-sm font-bold text-(--primary-fg) bg-(--primary) hover:bg-[#726242] hover:-translate-y-1 active:scale-[0.98] transition-all"
+                  >
+                    <Search className="w-5 h-5" />
+                    Begin New Search
+                  </button>
+                  <button
+                    onClick={() => navigate("/admin/users")}
+                    className="w-full sm:w-auto text-sm font-bold text-(--primary) border-2 border-(--primary)/20 py-4 px-8 rounded-2xl hover:bg-(--primary)/5 transition-all"
+                  >
+                    Invite Colleagues
+                  </button>
+                </div>
               </motion.div>
             )}
 

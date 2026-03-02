@@ -1,2 +1,1 @@
-- discussion board name to be changed to something else
-- dashboard ui to be better especially when it is empty
+- in the shared notes, the new texts appear on top. They should appear on bottom.

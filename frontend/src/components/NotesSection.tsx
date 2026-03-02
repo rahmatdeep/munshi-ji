@@ -84,8 +84,12 @@ export default function NotesSection({
         { headers: { Authorization: `Bearer ${token}` } },
       );
       // Briefly show success state if needed
-    } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to save personal note");
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.error || "Failed to save personal note");
+      } else {
+        setError("Failed to save personal note");
+      }
     } finally {
       setIsSavingPersonal(false);
     }
@@ -103,8 +107,12 @@ export default function NotesSection({
         headers: { Authorization: `Bearer ${token}` },
       });
       setPersonalContent("");
-    } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to delete personal note");
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.error || "Failed to delete personal note");
+      } else {
+        setError("Failed to delete personal note");
+      }
     } finally {
       setIsSavingPersonal(false);
     }
@@ -125,8 +133,12 @@ export default function NotesSection({
       );
       setSharedNotes([response.data.sharedNote, ...sharedNotes]);
       setNewSharedContent("");
-    } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to post shared note");
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.error || "Failed to post shared note");
+      } else {
+        setError("Failed to post shared note");
+      }
     } finally {
       setIsPostingShared(false);
     }
@@ -142,8 +154,12 @@ export default function NotesSection({
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setSharedNotes(sharedNotes.filter((n) => n.id !== noteId));
-    } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to delete shared note");
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.error || "Failed to delete shared note");
+      } else {
+        setError("Failed to delete shared note");
+      }
     }
   };
 
@@ -217,10 +233,10 @@ export default function NotesSection({
           </div>
           <div>
             <h3 className="font-serif-logo font-bold text-xl text-(--foreground)">
-              Discussion Board
+              Collaborative Insights
             </h3>
             <p className="text-xs text-(--color-sage) font-medium">
-              Visible to everyone who has saved this case.
+              Share updates and notes with everyone who has saved this case.
             </p>
           </div>
         </div>
