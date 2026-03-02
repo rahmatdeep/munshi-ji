@@ -303,7 +303,7 @@ router.get(
               },
             },
             orderBy: {
-              createdAt: "desc",
+              createdAt: "asc",
             },
           },
           personalNotes: userId

@@ -131,7 +131,7 @@ export default function NotesSection({
         { content: newSharedContent },
         { headers: { Authorization: `Bearer ${token}` } },
       );
-      setSharedNotes([response.data.sharedNote, ...sharedNotes]);
+      setSharedNotes([...sharedNotes, response.data.sharedNote]);
       setNewSharedContent("");
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {

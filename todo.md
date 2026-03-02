@@ -1,1 +1,2 @@
-- in the shared notes, the new texts appear on top. They should appear on bottom.
+- for the share button input, we should show a dropdown of users to share with instead of having to manually type the email
+- make the personal notes better looking

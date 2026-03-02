@@ -273,12 +273,17 @@ export default function Dashboard() {
                     <Search className="w-5 h-5" />
                     Begin New Search
                   </button>
-                  <button
-                    onClick={() => navigate("/admin/users")}
-                    className="w-full sm:w-auto text-sm font-bold text-(--primary) border-2 border-(--primary)/20 py-4 px-8 rounded-2xl hover:bg-(--primary)/5 transition-all"
-                  >
-                    Invite Colleagues
-                  </button>
+                  {localStorage.getItem("token") &&
+                    JSON.parse(
+                      atob(localStorage.getItem("token")!.split(".")[1]),
+                    ).role === "ADMIN" && (
+                      <button
+                        onClick={() => navigate("/admin/users")}
+                        className="w-full sm:w-auto text-sm font-bold text-(--primary) border-2 border-(--primary)/20 py-4 px-8 rounded-2xl hover:bg-(--primary)/5 transition-all"
+                      >
+                        Invite Colleagues
+                      </button>
+                    )}
                 </div>
               </motion.div>
             )}
