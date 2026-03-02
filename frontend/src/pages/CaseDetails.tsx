@@ -24,7 +24,8 @@ export default function CaseDetails() {
   );
   const [error, setError] = useState("");
   const [caseData, setCaseData] = useState<any>(null);
-  const [isRemoving, setIsRemoving] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   useEffect(() => {
@@ -41,6 +42,7 @@ export default function CaseDetails() {
         });
 
         setCaseData(response.data.case);
+        setIsSaved(response.data.case.isSaved);
         setStatus("success");
       } catch (err: any) {
         console.error("Fetch case details error:", err);
@@ -52,6 +54,31 @@ export default function CaseDetails() {
     fetchCaseDetails();
   }, [id]);
 
+  const handleSave = async () => {
+    if (!caseData || !id) return;
+
+    setIsSaving(true);
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        `${API_URL}/api/cases/save`,
+        { caseId: id },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      setIsSaved(true);
+    } catch (err: any) {
+      console.error("Save error:", err);
+      alert(err.response?.data?.error || "Failed to save case to dashboard.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleUnsave = async () => {
     if (!id) return;
     if (
@@ -59,7 +86,7 @@ export default function CaseDetails() {
     )
       return;
 
-    setIsRemoving(true);
+    setIsSaving(true);
     try {
       const token = localStorage.getItem("token");
       await axios.post(
@@ -72,13 +99,15 @@ export default function CaseDetails() {
         },
       );
 
+      setIsSaved(false);
       navigate("/dashboard", { replace: true });
     } catch (err: any) {
       console.error("Unsave error:", err);
       alert(
         err.response?.data?.error || "Failed to remove case from dashboard.",
       );
-      setIsRemoving(false);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -208,28 +237,53 @@ export default function CaseDetails() {
                     <Share2 className="w-4 h-4" />
                     Share Case
                   </button>
-                  <button
-                    onClick={handleUnsave}
-                    disabled={isRemoving}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold shadow-md transition-all bg-white border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 hover:shadow-red-500/10 hover:-translate-y-0.5 disabled:opacity-80 disabled:cursor-not-allowed"
-                  >
-                    {isRemoving ? (
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{
-                          duration: 1,
-                          repeat: Infinity,
-                          ease: "linear",
-                        }}
-                        className="w-4 h-4 border-2 border-red-600/30 border-t-red-600 rounded-full"
-                      />
-                    ) : (
-                      <>
-                        <Trash2 className="w-4 h-4" />
-                        Unsave Dashboard
-                      </>
-                    )}
-                  </button>
+                  {isSaved ? (
+                    <button
+                      onClick={handleUnsave}
+                      disabled={isSaving}
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold shadow-md transition-all bg-white border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 hover:shadow-red-500/10 hover:-translate-y-0.5 disabled:opacity-80 disabled:cursor-not-allowed"
+                    >
+                      {isSaving ? (
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{
+                            duration: 1,
+                            repeat: Infinity,
+                            ease: "linear",
+                          }}
+                          className="w-4 h-4 border-2 border-red-600/30 border-t-red-600 rounded-full"
+                        />
+                      ) : (
+                        <>
+                          <Trash2 className="w-4 h-4" />
+                          Unsave Dashboard
+                        </>
+                      )}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleSave}
+                      disabled={isSaving}
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold shadow-md transition-all bg-(--primary) hover:bg-[#726242] text-(--primary-fg) shadow-(--primary)/20 hover:-translate-y-0.5 disabled:opacity-80 disabled:cursor-not-allowed"
+                    >
+                      {isSaving ? (
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{
+                            duration: 1,
+                            repeat: Infinity,
+                            ease: "linear",
+                          }}
+                          className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+                        />
+                      ) : (
+                        <>
+                          <Briefcase className="w-4 h-4" />
+                          Save to Dashboard
+                        </>
+                      )}
+                    </button>
+                  )}
                 </div>
               </CaseView>
 

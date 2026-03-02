@@ -311,6 +311,13 @@ router.get(
                 where: { userId },
               }
             : undefined,
+          _count: {
+            select: {
+              savedBy: {
+                where: { id: userId || "" },
+              },
+            },
+          },
         },
       });
 
@@ -318,11 +325,15 @@ router.get(
         return res.status(404).json({ error: "Case not found" });
       }
 
+      const isSaved = (caseDetails._count?.savedBy || 0) > 0;
+
       // Flatten personal note
       const responseData = {
         ...caseDetails,
+        isSaved,
         personalNote: (caseDetails as any).personalNotes?.[0] || null,
         personalNotes: undefined,
+        _count: undefined,
       };
 
       return res.json({ case: responseData });
@@ -391,7 +402,7 @@ router.patch(
   "/:id/personal-note",
   authMiddleware,
   async (req: AuthRequest, res: Response): Promise<Response | void> => {
-    const caseId = req.params.id;
+    const caseId = req.params.id as string;
     const userId = req.user?.userId;
     const result = personalNoteSchema.safeParse(req.body);
 
@@ -430,7 +441,7 @@ router.delete(
   "/:id/personal-note",
   authMiddleware,
   async (req: AuthRequest, res: Response): Promise<Response | void> => {
-    const caseId = req.params.id;
+    const caseId = req.params.id as string;
     const userId = req.user?.userId;
 
     if (!userId) return res.status(401).json({ error: "Unauthorized" });
@@ -457,7 +468,7 @@ router.post(
   "/:id/shared-notes",
   authMiddleware,
   async (req: AuthRequest, res: Response): Promise<Response | void> => {
-    const caseId = req.params.id;
+    const caseId = req.params.id as string;
     const userId = req.user?.userId;
     const result = sharedNoteSchema.safeParse(req.body);
 
@@ -495,7 +506,7 @@ router.delete(
   "/:id/shared-notes/:noteId",
   authMiddleware,
   async (req: AuthRequest, res: Response): Promise<Response | void> => {
-    const noteId = req.params.noteId;
+    const noteId = req.params.noteId as string;
     const userId = req.user?.userId;
 
     if (!userId) return res.status(401).json({ error: "Unauthorized" });

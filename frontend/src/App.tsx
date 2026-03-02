@@ -17,6 +17,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/search" element={<SearchCases />} />
           <Route path="/case/:id" element={<CaseDetails />} />
+          <Route path="/share/case/:id" element={<CaseDetails />} />
           <Route path="/admin/users" element={<AdminUsers />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
