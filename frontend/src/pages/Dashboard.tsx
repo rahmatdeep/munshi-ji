@@ -14,6 +14,7 @@ import {
   Briefcase,
   Trash2,
   ChevronRight,
+  Users,
 } from "lucide-react";
 
 export default function Dashboard() {
@@ -53,7 +54,10 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    fetchSavedCases();
+    const init = async () => {
+      await fetchSavedCases();
+    };
+    init();
   }, []);
 
   const handleUnsave = async (caseId: string) => {
@@ -116,6 +120,26 @@ export default function Dashboard() {
         </motion.div>
 
         <div className="flex items-center gap-4">
+          <AnimatePresence>
+            {localStorage.getItem("token") &&
+              JSON.parse(atob(localStorage.getItem("token")!.split(".")[1]))
+                .role === "ADMIN" && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  key="admin-users"
+                >
+                  <button
+                    onClick={() => navigate("/admin/users")}
+                    className="flex items-center gap-2 text-sm font-semibold text-amber-600 transition-all px-4 py-2 rounded-full hover:bg-amber-50 border border-transparent hover:border-amber-200"
+                  >
+                    <Users className="w-4 h-4" />
+                    <span className="hidden sm:inline">Manage Users</span>
+                  </button>
+                </motion.div>
+              )}
+          </AnimatePresence>
+
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
