@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
+import { API_URL } from "../lib/api";
 import { useNavigate } from "react-router-dom";
 import {
   Search,
@@ -185,7 +186,7 @@ export default function SearchCases() {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "http://localhost:3000/api/cases/fetch",
+        `${API_URL}/api/cases/fetch`,
         {
           case_type: caseType,
           case_no: caseNo,
@@ -221,7 +222,7 @@ export default function SearchCases() {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "http://localhost:3000/api/cases/save",
+        `${API_URL}/api/cases/save`,
         {
           caseType: caseType,
           caseNo: caseNo,
@@ -257,7 +258,7 @@ export default function SearchCases() {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        "http://localhost:3000/api/cases/unsave",
+        `${API_URL}/api/cases/unsave`,
         {
           caseId: savedCaseId,
         },

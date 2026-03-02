@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { API_URL } from "../lib/api";
 import { useNavigate } from "react-router-dom";
 
 export default function SignIn() {
@@ -25,7 +26,7 @@ export default function SignIn() {
     setError("");
 
     try {
-      await axios.post("http://localhost:3000/api/auth/request-magic-link", {
+      await axios.post(`${API_URL}/api/auth/request-magic-link`, {
         email,
       });
       setStatus("success");

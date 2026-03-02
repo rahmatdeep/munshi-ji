@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
+import { API_URL } from "../lib/api";
 import {
   Briefcase,
   ArrowLeft,
@@ -33,14 +34,11 @@ export default function CaseDetails() {
       setStatus("loading");
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get(
-          `http://localhost:3000/api/cases/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+        const response = await axios.get(`${API_URL}/api/cases/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-        );
+        });
 
         setCaseData(response.data.case);
         setStatus("success");
@@ -65,7 +63,7 @@ export default function CaseDetails() {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        "http://localhost:3000/api/cases/unsave",
+        `${API_URL}/api/cases/unsave`,
         { caseId: id },
         {
           headers: {

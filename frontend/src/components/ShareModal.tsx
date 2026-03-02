@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Send, Mail, CheckCircle, AlertCircle } from "lucide-react";
 import axios from "axios";
+import { API_URL } from "../lib/api";
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -30,7 +31,7 @@ export default function ShareModal({
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        "http://localhost:3000/api/cases/share",
+        `${API_URL}/api/cases/share`,
         { caseId, recipientEmail: email },
         { headers: { Authorization: `Bearer ${token}` } },
       );

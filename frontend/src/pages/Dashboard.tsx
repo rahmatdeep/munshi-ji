@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
+import { API_URL } from "../lib/api";
 import { useNavigate } from "react-router-dom";
 import {
   Search,
@@ -32,14 +33,11 @@ export default function Dashboard() {
     setStatus("loading");
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get(
-        "http://localhost:3000/api/cases/saved",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await axios.get(`${API_URL}/api/cases/saved`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       const cases = response.data.savedCases || [];
       setSavedCases(cases);
@@ -67,7 +65,7 @@ export default function Dashboard() {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        "http://localhost:3000/api/cases/unsave",
+        `${API_URL}/api/cases/unsave`,
         { caseId },
         {
           headers: {

@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import axios from 'axios';
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import axios from "axios";
+import { API_URL } from "../lib/api";
 
 type Status = 'verifying' | 'success' | 'error';
 
@@ -26,7 +27,10 @@ export default function VerifyMagicLink() {
 
         const verifyToken = async () => {
             try {
-                const response = await axios.post('http://localhost:3000/api/auth/verify-magic-link', { token });
+        const response = await axios.post(
+          `${API_URL}/api/auth/verify-magic-link`,
+          { token },
+        );
                 const { token: jwtToken } = response.data;
 
                 // Store the JWT
