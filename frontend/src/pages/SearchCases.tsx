@@ -415,7 +415,7 @@ export default function SearchCases() {
                 type="number"
                 required
                 min="1900"
-                max="2100"
+                max={new Date().getFullYear()}
                 value={caseYear}
                 onChange={(e) => setCaseYear(e.target.value)}
                 className="w-full bg-white/50 border-2 border-(--muted)/50 rounded-xl px-4 py-3 text-sm font-semibold text-(--foreground) outline-none focus:border-(--primary) focus:ring-4 focus:ring-(--primary)/10 transition-all"
