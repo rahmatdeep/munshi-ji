@@ -9,4 +9,3 @@
 - tag on search result ->check whats happening
 - filter on dashboard
 - change name to munshiji to japsehaj singh
-- change tagline from legal os -> legal office

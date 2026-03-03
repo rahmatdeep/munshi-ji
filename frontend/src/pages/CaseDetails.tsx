@@ -142,7 +142,7 @@ export default function CaseDetails() {
               MUNSHI JI
             </h1>
             <p className="text-[10px] md:text-xs text-(--secondary) font-bold tracking-[0.2em] uppercase">
-              Legal Operating System
+              Legal Office
             </p>
           </div>
         </motion.div>
