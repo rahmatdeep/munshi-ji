@@ -11,6 +11,7 @@ import {
   AlertCircle,
   MessageSquare,
 } from "lucide-react";
+import { useConfirm } from "../hooks/useConfirm";
 
 interface Note {
   id: string;
@@ -43,6 +44,7 @@ export default function NotesSection({
     initialSharedNotes || [],
   );
   const [newSharedContent, setNewSharedContent] = useState("");
+  const confirm = useConfirm();
 
   const [isSavingPersonal, setIsSavingPersonal] = useState(false);
   const [isPostingShared, setIsPostingShared] = useState(false);
@@ -87,7 +89,14 @@ export default function NotesSection({
   const handleClearPersonalNote = async () => {
     if (!isSaved) return;
     if (!personalContent && !initialPersonalNote) return;
-    if (!confirm("Are you sure you want to delete your personal note?")) return;
+    const confirmed = await confirm({
+      title: "Delete Personal Note",
+      message: "Are you sure you want to delete your personal note?",
+      confirmLabel: "Delete Note",
+      variant: "danger",
+    });
+
+    if (!confirmed) return;
 
     setIsSavingPersonal(true);
     setError("");
@@ -136,7 +145,14 @@ export default function NotesSection({
 
   const handleDeleteSharedNote = async (noteId: string) => {
     if (!isSaved) return;
-    if (!confirm("Delete this shared note?")) return;
+    const confirmed = await confirm({
+      title: "Delete Shared Note",
+      message: "Delete this shared note?",
+      confirmLabel: "Delete Note",
+      variant: "danger",
+    });
+
+    if (!confirmed) return;
 
     try {
       const token = localStorage.getItem("token");

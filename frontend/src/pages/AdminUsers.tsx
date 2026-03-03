@@ -16,6 +16,7 @@ import {
   CheckCircle2,
   Trash2,
 } from "lucide-react";
+import Dropdown from "../components/ui/Dropdown";
 
 interface UserData {
   id: string;
@@ -238,16 +239,17 @@ export default function AdminUsers() {
                         </label>
                         <div className="relative">
                           <Shield className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-(--secondary)" />
-                          <select
+                          <Dropdown
+                            options={[
+                              { label: "Standard User", value: "USER" },
+                              { label: "Administrator", value: "ADMIN" },
+                            ]}
                             value={newUserRole}
-                            onChange={(e) =>
-                              setNewUserRole(e.target.value as any)
+                            onChange={(val) =>
+                              setNewUserRole(val as "USER" | "ADMIN")
                             }
-                            className="w-full bg-white/50 border-2 border-(--muted)/50 rounded-xl pl-11 pr-4 py-3 text-sm font-semibold outline-none focus:border-(--primary) transition-all appearance-none cursor-pointer"
-                          >
-                            <option value="USER">Standard User</option>
-                            <option value="ADMIN">Administrator</option>
-                          </select>
+                            searchable={false}
+                          />
                         </div>
                       </div>
                     </div>

@@ -12,7 +12,6 @@ import {
   Hash,
   CheckCircle,
   Info,
-  ChevronRight,
   Briefcase,
   BookmarkMinus,
   Share2,
@@ -20,6 +19,7 @@ import {
 import CaseView from "../components/CaseView";
 import ShareModal from "../components/ShareModal";
 import NotesSection from "../components/NotesSection";
+import Dropdown from "../components/ui/Dropdown";
 
 const VALID_CASE_TYPES = [
   "CWP",
@@ -366,23 +366,15 @@ export default function SearchCases() {
               >
                 <Briefcase className="w-4 h-4 text-(--secondary)" /> Case Type
               </label>
-              <div className="relative group">
-                <select
-                  id="caseType"
-                  value={caseType}
-                  onChange={(e) => setCaseType(e.target.value)}
-                  className="w-full bg-white/50 border-2 border-(--muted)/50 rounded-xl px-4 py-3 text-sm font-semibold text-(--foreground) outline-none focus:border-(--primary) focus:ring-4 focus:ring-(--primary)/10 transition-all appearance-none cursor-pointer"
-                >
-                  {VALID_CASE_TYPES.map((type) => (
-                    <option key={type} value={type}>
-                      {type}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-(--secondary)">
-                  <ChevronRight className="w-4 h-4 rotate-90" />
-                </div>
-              </div>
+              <Dropdown
+                options={VALID_CASE_TYPES.map((type) => ({
+                  label: type,
+                  value: type,
+                }))}
+                value={caseType}
+                onChange={(val) => setCaseType(val as string)}
+                placeholder="Select Case Type"
+              />
             </div>
 
             <div className="w-full md:flex-1 space-y-2">

@@ -15,6 +15,7 @@ import {
   ChevronRight,
   Users,
 } from "lucide-react";
+import { useConfirm } from "../hooks/useConfirm";
 
 export default function Dashboard() {
   const [status, setStatus] = useState<
@@ -23,6 +24,7 @@ export default function Dashboard() {
   const [error, setError] = useState("");
   const [savedCases, setSavedCases] = useState<any[]>([]);
   const navigate = useNavigate();
+  const confirm = useConfirm();
 
   const [currentUser] = useState<any>(() => {
     const userJson = localStorage.getItem("user");
@@ -73,10 +75,14 @@ export default function Dashboard() {
   }, []);
 
   const handleUnsave = async (caseId: string) => {
-    if (
-      !confirm("Are you sure you want to remove this case from your dashboard?")
-    )
-      return;
+    const confirmed = await confirm({
+      title: "Remove Case",
+      message: "Are you sure you want to remove this case from your dashboard?",
+      confirmLabel: "Remove Case",
+      variant: "danger",
+    });
+
+    if (!confirmed) return;
 
     try {
       const token = localStorage.getItem("token");

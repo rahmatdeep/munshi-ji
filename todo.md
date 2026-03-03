@@ -4,6 +4,4 @@
 - CL list pdf -> search cases with 
 - save lawyer id in db
 - https://new.phhc.gov.in/case-status/advocate-name get all cases by id
-- add option to create drafts with ai 
-- use a custom confirm dialog instead of browser's confirm
-- make custom dropdown component as the browser's dropdown is not good
+- add option to create drafts with ai

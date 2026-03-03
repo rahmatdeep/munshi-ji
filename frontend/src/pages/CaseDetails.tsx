@@ -11,6 +11,7 @@ import {
   ShieldAlert,
   Share2,
 } from "lucide-react";
+import { useConfirm } from "../hooks/useConfirm";
 import CaseView from "../components/CaseView";
 import ShareModal from "../components/ShareModal";
 import NotesSection from "../components/NotesSection";
@@ -18,6 +19,7 @@ import NotesSection from "../components/NotesSection";
 export default function CaseDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const confirm = useConfirm();
 
   const [status, setStatus] = useState<"loading" | "success" | "error">(
     "loading",
@@ -81,10 +83,14 @@ export default function CaseDetails() {
 
   const handleUnsave = async () => {
     if (!id) return;
-    if (
-      !confirm("Are you sure you want to remove this case from your dashboard?")
-    )
-      return;
+    const confirmed = await confirm({
+      title: "Remove Case",
+      message: "Are you sure you want to remove this case from your dashboard?",
+      confirmLabel: "Remove Case",
+      variant: "danger",
+    });
+
+    if (!confirmed) return;
 
     setIsSaving(true);
     try {

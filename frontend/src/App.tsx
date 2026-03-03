@@ -6,23 +6,26 @@ import SearchCases from "./pages/SearchCases";
 import CaseDetails from "./pages/CaseDetails";
 import AdminUsers from "./pages/AdminUsers";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { ConfirmProvider } from "./context/ConfirmContext";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<SignIn />} />
-        <Route path="/verify-magic-link" element={<VerifyMagicLink />} />
-        <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/search" element={<SearchCases />} />
-          <Route path="/case/:id" element={<CaseDetails />} />
-          <Route path="/share/case/:id" element={<CaseDetails />} />
-          <Route path="/admin/users" element={<AdminUsers />} />
-        </Route>
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+    <ConfirmProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<SignIn />} />
+          <Route path="/verify-magic-link" element={<VerifyMagicLink />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/search" element={<SearchCases />} />
+            <Route path="/case/:id" element={<CaseDetails />} />
+            <Route path="/share/case/:id" element={<CaseDetails />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
+          </Route>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </ConfirmProvider>
   );
 }
 
