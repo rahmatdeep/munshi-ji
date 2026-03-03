@@ -1,7 +1,12 @@
 - realted cases CRM-M
 - data fields maybe invalid court number can be string or number
 - date format
-- CL list pdf -> search cases with 
+- CL list pdf -> search cases with
 - save lawyer id in db
 - https://new.phhc.gov.in/case-status/advocate-name get all cases by id
 - add option to create drafts with ai
+
+- tag on search result ->check whats happening
+- filter on dashboard
+- change name to munshiji to japsehaj singh
+- change tagline from legal os -> legal office
