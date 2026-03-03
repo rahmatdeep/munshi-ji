@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 import {
   Users,
   UserPlus,
-  ArrowLeft,
   Mail,
   User,
   Shield,
@@ -97,38 +96,8 @@ export default function AdminUsers() {
   };
 
   return (
-    <div className="min-h-screen bg-(--background) flex flex-col selection:bg-(--muted) selection:text-(--foreground) relative overflow-hidden font-sans">
-      {/* Background elements */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none opacity-50">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-(--muted) blur-3xl opacity-60 mix-blend-multiply" />
-        <div className="absolute top-[30%] right-[-10%] w-[40%] h-[40%] rounded-full bg-(--secondary) blur-3xl opacity-30 mix-blend-multiply" />
-      </div>
-
-      {/* Header */}
-      <header className="px-6 md:px-12 py-5 flex justify-between items-center relative z-20 w-full backdrop-blur-md border-b border-(--muted)/40 bg-white/20">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-linear-to-br from-(--primary) to-(--primary-hover) text-(--primary-fg) flex items-center justify-center font-serif-logo font-bold text-2xl shadow-xl shadow-(--primary)/20 border border-(--primary)/30">
-            M
-          </div>
-          <div>
-            <h1 className="font-serif-logo text-2xl md:text-3xl font-bold tracking-tight text-(--foreground) leading-none mb-1">
-              MUNSHI JI
-            </h1>
-            <p className="text-[10px] md:text-xs text-(--secondary) font-bold tracking-[0.2em] uppercase">
-              Admin Console
-            </p>
-          </div>
-        </div>
-        <button
-          onClick={() => navigate("/dashboard")}
-          className="flex items-center gap-2 text-sm font-semibold text-(--primary) transition-all px-4 py-2 rounded-full hover:bg-(--primary)/10 border border-transparent hover:border-(--primary)/30"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back to Dashboard</span>
-        </button>
-      </header>
-
-      <main className="flex-1 w-full max-w-6xl mx-auto p-4 md:p-8 relative z-10">
+    <>
+      <div className="flex-1 w-full max-w-6xl mx-auto p-4 md:p-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
             <h2 className="text-3xl font-serif-logo font-bold text-(--foreground) tracking-tight flex items-center gap-3">
@@ -350,7 +319,7 @@ export default function AdminUsers() {
             </motion.div>
           )}
         </AnimatePresence>
-      </main>
+      </div>
 
       {/* Action Notifications */}
       <AnimatePresence>
@@ -368,6 +337,6 @@ export default function AdminUsers() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 }
