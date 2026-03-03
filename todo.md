@@ -1,4 +1,3 @@
-- ui enhancements
 - year should not go beyond current year
 - realted cases CRM-M
 - data fields maybe invalid court number can be string or number
@@ -7,3 +6,4 @@
 - save lawyer id in db
 - https://new.phhc.gov.in/case-status/advocate-name get all cases by id
 - add option to create drafts with ai 
+- use a custom confirm dialog instead of browser's confirm

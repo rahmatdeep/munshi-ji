@@ -129,16 +129,16 @@ export default function ShareModal({
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="w-full max-w-lg bg-[#ECE7D1] rounded-4xl shadow-2xl border border-(--color-tan)/30"
+            className="w-full max-w-lg bg-(--background) rounded-4xl shadow-2xl border border-(--muted)/30"
           >
-            <div className="flex justify-between items-center p-6 border-b border-(--color-tan)/20 bg-white/40">
+            <div className="flex justify-between items-center p-6 border-b border-(--muted)/20 bg-white/40">
               <h3 className="text-xl font-serif-logo font-bold text-(--foreground) flex items-center gap-2">
-                <Mail className="w-5 h-5 text-(--color-sage)" /> Collaborative
+                <Mail className="w-5 h-5 text-(--secondary)" /> Collaborative
                 Share
               </h3>
               <button
                 onClick={onClose}
-                className="p-2 rounded-full hover:bg-(--color-tan)/20 text-(--color-sage) transition-colors"
+                className="p-2 rounded-full hover:bg-(--muted)/20 text-(--secondary) transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -157,14 +157,14 @@ export default function ShareModal({
                   <h4 className="text-2xl font-serif-logo font-bold text-(--foreground)">
                     Access Granted
                   </h4>
-                  <p className="text-sm text-(--color-sage) mt-2 max-w-xs font-medium font-sans">
+                  <p className="text-sm text-(--secondary) mt-2 max-w-xs font-medium font-sans">
                     The selected colleagues will receive an invitation to join
                     the collaboration board shortly.
                   </p>
                 </div>
               ) : (
                 <form onSubmit={handleShare} className="space-y-6">
-                  <p className="text-sm text-(--color-sage) leading-relaxed mb-6 font-medium font-sans">
+                  <p className="text-sm text-(--secondary) leading-relaxed mb-6 font-medium font-sans">
                     Invite colleagues to this case to enable shared timelines,
                     collaborative insights, and team strategy.
                   </p>
@@ -182,7 +182,7 @@ export default function ShareModal({
                     </label>
 
                     <div className="relative">
-                      <div className="min-h-14 w-full bg-white/60 border-2 border-(--color-tan)/50 rounded-2xl p-2 flex flex-wrap gap-2 focus-within:border-(--primary) focus-within:ring-8 focus-within:ring-(--primary)/5 transition-all">
+                      <div className="min-h-14 w-full bg-white/60 border-2 border-(--muted)/50 rounded-2xl p-2 flex flex-wrap gap-2 focus-within:border-(--primary) focus-within:ring-8 focus-within:ring-(--primary)/5 transition-all">
                         {selectedEmails.map((email) => (
                           <div
                             key={email}
@@ -200,7 +200,7 @@ export default function ShareModal({
                         ))}
                         <input
                           type="text"
-                          className="flex-1 bg-transparent border-none outline-none py-2 px-2 text-sm font-semibold placeholder:font-normal placeholder:text-(--color-sage)/50 min-w-40 font-sans"
+                          className="flex-1 bg-transparent border-none outline-none py-2 px-2 text-sm font-semibold placeholder:font-normal placeholder:text-(--secondary)/50 min-w-40 font-sans"
                           placeholder={
                             selectedEmails.length === 0
                               ? "Search names or type email..."
@@ -220,15 +220,15 @@ export default function ShareModal({
                               initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: 10 }}
-                              className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-(--color-tan)/30 max-h-60 overflow-y-auto z-60 custom-scrollbar"
+                              className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-(--muted)/30 max-h-60 overflow-y-auto z-60 custom-scrollbar"
                             >
                               <div className="p-2">
                                 {isLoadingUsers ? (
-                                  <div className="p-4 text-center text-xs text-(--color-sage) font-bold animate-pulse">
+                                  <div className="p-4 text-center text-xs text-(--secondary) font-bold animate-pulse">
                                     Accessing Directory...
                                   </div>
                                 ) : filteredUsers.length === 0 ? (
-                                  <div className="p-4 text-center text-xs text-(--color-sage) font-medium">
+                                  <div className="p-4 text-center text-xs text-(--secondary) font-medium">
                                     {searchQuery.includes("@") ? (
                                       <div className="flex flex-col gap-2">
                                         <span>
@@ -251,13 +251,13 @@ export default function ShareModal({
                                         toggleUser(user.email);
                                         setSearchQuery("");
                                       }}
-                                      className={`w-full flex items-center justify-between p-3 rounded-xl transition-all ${selectedEmails.includes(user.email) ? "bg-(--primary)/5" : "hover:bg-(--color-tan)/10"}`}
+                                      className={`w-full flex items-center justify-between p-3 rounded-xl transition-all ${selectedEmails.includes(user.email) ? "bg-(--primary)/5" : "hover:bg-(--muted)/10"}`}
                                     >
                                       <div className="flex flex-col items-start">
                                         <span className="text-sm font-bold text-(--foreground)">
                                           {user.name || "Unnamed Legal Clerk"}
                                         </span>
-                                        <span className="text-xs text-(--color-sage)">
+                                        <span className="text-xs text-(--secondary)">
                                           {user.email}
                                         </span>
                                       </div>
@@ -286,7 +286,7 @@ export default function ShareModal({
                     disabled={
                       status === "loading" || selectedEmails.length === 0
                     }
-                    className="w-full flex justify-center items-center gap-3 py-4 px-8 rounded-2xl shadow-xl shadow-(--primary)/20 text-sm font-black text-white bg-(--primary) hover:bg-[#726242] focus:outline-none focus:ring-8 focus:ring-(--primary)/5 disabled:opacity-40 disabled:cursor-not-allowed transition-all mt-8 active:scale-[0.98] uppercase tracking-widest"
+                    className="w-full flex justify-center items-center gap-3 py-4 px-8 rounded-2xl shadow-xl shadow-(--primary)/20 text-sm font-black text-white bg-(--primary) hover:bg-(--primary-hover) focus:outline-none focus:ring-8 focus:ring-(--primary)/5 disabled:opacity-40 disabled:cursor-not-allowed transition-all mt-8 active:scale-[0.98] uppercase tracking-widest"
                   >
                     {status === "loading" ? (
                       <motion.div

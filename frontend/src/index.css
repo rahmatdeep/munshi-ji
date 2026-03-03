@@ -3,27 +3,64 @@
 
 @layer base {
   :root {
-    /* User exact colors */
-    --color-brown: #8a7650;
-    --color-sage: #8e977d;
-    --color-cream: #ece7d1;
-    --color-tan: #dbcea5;
+    /* Base color scale */
+    --color-brown-900: #4a3f2b;
+    --color-brown-800: #5c4e35;
+    --color-brown-700: #6b5a3a;
+    --color-brown-600: #7c6845;
+    --color-brown-500: #8a7650;
+    --color-brown-400: #a4916a;
+    --color-brown-300: #bdac8a;
+    --color-brown-200: #d6cab3;
+    --color-brown-100: #ede8dc;
 
-    /* Mapped to roles */
-    --background: var(--color-cream);
-    --foreground: var(--color-brown);
+    --color-sage-900: #49503f;
+    --color-sage-700: #6a715c;
+    --color-sage-500: #8e977d;
+    --color-sage-300: #b5bc98;
+    --color-sage-100: #e2e6d6;
 
-    --card: var(--color-cream);
-    --card-border: var(--color-tan);
+    --color-cream-900: #a39c87;
+    --color-cream-700: #c9c1aa;
+    --color-cream-500: #ece7d1;
+    --color-cream-300: #f4f1e5;
+    --color-cream-100: #fbfaf6;
 
-    --primary: var(--color-brown);
-    --primary-fg: var(--color-cream);
+    --color-tan-900: #8c8263;
+    --color-tan-700: #b3a785;
+    --color-tan-500: #dbcea5;
+    --color-tan-300: #e8e0c3;
+    --color-tan-100: #f5f2e8;
 
-    --muted: var(--color-tan);
-    --muted-fg: var(--color-sage);
+    --color-white: #ffffff;
 
-    --accent: var(--color-sage);
-    --accent-fg: var(--color-cream);
+    /* Semantic Mappings */
+    --background: var(--color-cream-500);
+    --foreground: var(--color-brown-900);
+
+    --card: var(--color-cream-100);
+    --card-border: var(--color-tan-500);
+
+    --primary: var(--color-brown-500);
+    --primary-hover: var(--color-brown-700);
+    --primary-active: var(--color-brown-800);
+    --primary-fg: var(--color-white);
+
+    --secondary: var(--color-sage-500);
+    --secondary-hover: var(--color-sage-700);
+    --secondary-fg: var(--color-white);
+
+    --muted: var(--color-tan-500);
+    --muted-bg: var(--color-cream-300);
+    --muted-fg: var(--color-sage-700);
+
+    --accent: var(--color-brown-300);
+    --accent-fg: var(--color-brown-900);
+
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.5rem;
   }
 
   body {
@@ -41,12 +78,20 @@
   }
 
   .glass-card {
-    @apply bg-(--card)/80 backdrop-blur-xl border border-(--card-border) shadow-xl shadow-(--color-sage)/10;
+    @apply bg-(--card)/85 backdrop-blur-2xl border border-(--card-border)/40 shadow-xl shadow-(--primary)/5 rounded-2xl;
     transform: translateZ(0);
     will-change: transform, opacity;
   }
 
   .glass-input {
-    @apply bg-(--background) border border-(--color-tan) focus:bg-(--background) focus:border-(--color-brown) focus:ring-4 focus:ring-(--color-brown)/10 transition-all duration-300 text-(--color-brown) placeholder:text-(--color-sage);
+    @apply bg-(--color-white)/60 border border-(--color-tan-500)/60 focus:bg-(--color-white) focus:border-(--primary) focus:ring-4 focus:ring-(--primary)/15 transition-all duration-300 text-(--foreground) placeholder:text-(--muted-fg) rounded-xl px-4 py-3;
+  }
+
+  .btn-primary {
+    @apply bg-(--primary) text-(--primary-fg) hover:bg-(--primary-hover) active:bg-(--primary-active) shadow-lg shadow-(--primary)/20 hover:shadow-xl hover:shadow-(--primary)/30 transition-all duration-300 rounded-xl px-6 py-3 font-bold active:scale-[0.98];
+  }
+
+  .btn-secondary {
+    @apply bg-(--secondary) text-(--secondary-fg) hover:bg-(--secondary-hover) shadow-lg shadow-(--secondary)/20 hover:shadow-xl hover:shadow-(--secondary)/30 transition-all duration-300 rounded-xl px-6 py-3 font-bold active:scale-[0.98];
   }
 }

@@ -96,24 +96,24 @@ export default function AdminUsers() {
   };
 
   return (
-    <div className="min-h-screen bg-[#ECE7D1] flex flex-col selection:bg-(--color-tan) selection:text-(--foreground) relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-(--background) flex flex-col selection:bg-(--muted) selection:text-(--foreground) relative overflow-hidden font-sans">
       {/* Background elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none opacity-50">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-(--color-tan) blur-3xl opacity-60 mix-blend-multiply" />
-        <div className="absolute top-[30%] right-[-10%] w-[40%] h-[40%] rounded-full bg-(--color-sage) blur-3xl opacity-30 mix-blend-multiply" />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-(--muted) blur-3xl opacity-60 mix-blend-multiply" />
+        <div className="absolute top-[30%] right-[-10%] w-[40%] h-[40%] rounded-full bg-(--secondary) blur-3xl opacity-30 mix-blend-multiply" />
       </div>
 
       {/* Header */}
-      <header className="px-6 md:px-12 py-5 flex justify-between items-center relative z-20 w-full backdrop-blur-md border-b border-(--color-tan)/40 bg-white/20">
+      <header className="px-6 md:px-12 py-5 flex justify-between items-center relative z-20 w-full backdrop-blur-md border-b border-(--muted)/40 bg-white/20">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-linear-to-br from-(--primary) to-[#6B5A3A] text-(--primary-fg) flex items-center justify-center font-serif-logo font-bold text-2xl shadow-xl shadow-(--primary)/20 border border-(--primary)/30">
+          <div className="w-12 h-12 rounded-xl bg-linear-to-br from-(--primary) to-(--primary-hover) text-(--primary-fg) flex items-center justify-center font-serif-logo font-bold text-2xl shadow-xl shadow-(--primary)/20 border border-(--primary)/30">
             M
           </div>
           <div>
             <h1 className="font-serif-logo text-2xl md:text-3xl font-bold tracking-tight text-(--foreground) leading-none mb-1">
               MUNSHI JI
             </h1>
-            <p className="text-[10px] md:text-xs text-(--color-sage) font-bold tracking-[0.2em] uppercase">
+            <p className="text-[10px] md:text-xs text-(--secondary) font-bold tracking-[0.2em] uppercase">
               Admin Console
             </p>
           </div>
@@ -134,13 +134,13 @@ export default function AdminUsers() {
               <Users className="w-8 h-8 text-(--primary)" />
               User Management
             </h2>
-            <p className="text-sm font-medium text-(--color-sage) mt-1">
+            <p className="text-sm font-medium text-(--secondary) mt-1">
               View and manage access for legal professionals.
             </p>
           </div>
           <button
             onClick={() => setIsAddingUser(true)}
-            className="flex items-center gap-2 py-3 px-6 rounded-xl shadow-lg shadow-(--primary)/20 text-sm font-bold text-(--primary-fg) bg-(--primary) hover:bg-[#726242] transition-all active:scale-[0.98]"
+            className="flex items-center gap-2 py-3 px-6 rounded-xl shadow-lg shadow-(--primary)/20 text-sm font-bold text-(--primary-fg) bg-(--primary) hover:bg-(--primary-hover) transition-all active:scale-[0.98]"
           >
             <UserPlus className="w-4 h-4" />
             Register New User
@@ -157,7 +157,7 @@ export default function AdminUsers() {
               className="flex flex-col items-center justify-center py-20"
             >
               <Loader2 className="w-12 h-12 text-(--primary) animate-spin mb-4" />
-              <p className="text-(--color-sage) font-medium">
+              <p className="text-(--secondary) font-medium">
                 Loading user database...
               </p>
             </motion.div>
@@ -192,7 +192,7 @@ export default function AdminUsers() {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="glass-card rounded-3xl overflow-hidden border-white/50 bg-white/40 mb-4"
+                  className="glass-card rounded-3xl overflow-hidden mb-4"
                 >
                   <form onSubmit={handleRegisterUser} className="p-6 md:p-8">
                     <h3 className="text-lg font-bold text-(--foreground) mb-6 flex items-center gap-2">
@@ -205,14 +205,14 @@ export default function AdminUsers() {
                           FullName
                         </label>
                         <div className="relative">
-                          <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-(--color-sage)" />
+                          <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-(--secondary)" />
                           <input
                             type="text"
                             required
                             value={newUserName}
                             onChange={(e) => setNewUserName(e.target.value)}
                             placeholder="e.g. Adv. John Doe"
-                            className="w-full bg-white/50 border-2 border-(--color-tan)/50 rounded-xl pl-11 pr-4 py-3 text-sm font-semibold outline-none focus:border-(--color-brown) focus:ring-4 focus:ring-(--color-brown)/10 transition-all"
+                            className="w-full bg-white/50 border-2 border-(--muted)/50 rounded-xl pl-11 pr-4 py-3 text-sm font-semibold outline-none focus:border-(--primary) focus:ring-4 focus:ring-(--primary)/10 transition-all"
                           />
                         </div>
                       </div>
@@ -221,14 +221,14 @@ export default function AdminUsers() {
                           Email Address
                         </label>
                         <div className="relative">
-                          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-(--color-sage)" />
+                          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-(--secondary)" />
                           <input
                             type="email"
                             required
                             value={newUserEmail}
                             onChange={(e) => setNewUserEmail(e.target.value)}
                             placeholder="john@example.com"
-                            className="w-full bg-white/50 border-2 border-(--color-tan)/50 rounded-xl pl-11 pr-4 py-3 text-sm font-semibold outline-none focus:border-(--color-brown) focus:ring-4 focus:ring-(--color-brown)/10 transition-all"
+                            className="w-full bg-white/50 border-2 border-(--muted)/50 rounded-xl pl-11 pr-4 py-3 text-sm font-semibold outline-none focus:border-(--primary) focus:ring-4 focus:ring-(--primary)/10 transition-all"
                           />
                         </div>
                       </div>
@@ -237,13 +237,13 @@ export default function AdminUsers() {
                           Access Level
                         </label>
                         <div className="relative">
-                          <Shield className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-(--color-sage)" />
+                          <Shield className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-(--secondary)" />
                           <select
                             value={newUserRole}
                             onChange={(e) =>
                               setNewUserRole(e.target.value as any)
                             }
-                            className="w-full bg-white/50 border-2 border-(--color-tan)/50 rounded-xl pl-11 pr-4 py-3 text-sm font-semibold outline-none focus:border-(--color-brown) transition-all appearance-none cursor-pointer"
+                            className="w-full bg-white/50 border-2 border-(--muted)/50 rounded-xl pl-11 pr-4 py-3 text-sm font-semibold outline-none focus:border-(--primary) transition-all appearance-none cursor-pointer"
                           >
                             <option value="USER">Standard User</option>
                             <option value="ADMIN">Administrator</option>
@@ -255,14 +255,14 @@ export default function AdminUsers() {
                       <button
                         type="button"
                         onClick={() => setIsAddingUser(false)}
-                        className="px-6 py-3 rounded-xl text-sm font-bold text-(--color-sage) hover:bg-black/5 transition-colors"
+                        className="px-6 py-3 rounded-xl text-sm font-bold text-(--secondary) hover:bg-black/5 transition-colors"
                       >
                         Cancel
                       </button>
                       <button
                         type="submit"
                         disabled={actionStatus === "submitting"}
-                        className="flex items-center gap-2 px-8 py-3 rounded-xl bg-(--primary) text-(--primary-fg) text-sm font-bold shadow-lg shadow-(--primary)/20 hover:bg-[#726242] disabled:opacity-70 transition-all"
+                        className="flex items-center gap-2 px-8 py-3 rounded-xl bg-(--primary) text-(--primary-fg) text-sm font-bold shadow-lg shadow-(--primary)/20 hover:bg-(--primary-hover) disabled:opacity-70 transition-all"
                       >
                         {actionStatus === "submitting" ? (
                           <Loader2 className="w-4 h-4 animate-spin" />
@@ -275,26 +275,26 @@ export default function AdminUsers() {
                 </motion.div>
               )}
 
-              <div className="glass-card rounded-3xl overflow-hidden border-white/50 bg-white/40">
+              <div className="glass-card rounded-3xl overflow-hidden ">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
                     <thead>
-                      <tr className="bg-white/40 border-b border-(--color-tan)/30">
-                        <th className="px-8 py-5 text-xs font-bold text-(--color-sage) uppercase tracking-widest">
+                      <tr className="bg-white/40 border-b border-(--muted)/30">
+                        <th className="px-8 py-5 text-xs font-bold text-(--secondary) uppercase tracking-widest">
                           User Details
                         </th>
-                        <th className="px-8 py-5 text-xs font-bold text-(--color-sage) uppercase tracking-widest">
+                        <th className="px-8 py-5 text-xs font-bold text-(--secondary) uppercase tracking-widest">
                           Role
                         </th>
-                        <th className="px-8 py-5 text-xs font-bold text-(--color-sage) uppercase tracking-widest">
+                        <th className="px-8 py-5 text-xs font-bold text-(--secondary) uppercase tracking-widest">
                           Registered
                         </th>
-                        <th className="px-8 py-5 text-xs font-bold text-(--color-sage) uppercase tracking-widest text-right">
+                        <th className="px-8 py-5 text-xs font-bold text-(--secondary) uppercase tracking-widest text-right">
                           Actions
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-(--color-tan)/20">
+                    <tbody className="divide-y divide-(--muted)/20">
                       {users.map((user) => (
                         <tr
                           key={user.id}
@@ -302,14 +302,14 @@ export default function AdminUsers() {
                         >
                           <td className="px-8 py-5">
                             <div className="flex items-center gap-4">
-                              <div className="w-10 h-10 rounded-full bg-linear-to-br from-(--color-tan) to-(--color-sage)/30 flex items-center justify-center text-(--primary) font-bold">
+                              <div className="w-10 h-10 rounded-full bg-linear-to-br from-(--muted) to-(--secondary)/30 flex items-center justify-center text-(--primary) font-bold">
                                 {user.name?.[0] || user.email[0].toUpperCase()}
                               </div>
                               <div>
                                 <p className="font-bold text-(--foreground)">
                                   {user.name || "Unnamed User"}
                                 </p>
-                                <p className="text-xs text-(--color-sage) flex items-center gap-1">
+                                <p className="text-xs text-(--secondary) flex items-center gap-1">
                                   <Mail className="w-3 h-3" />
                                   {user.email}
                                 </p>
@@ -327,7 +327,7 @@ export default function AdminUsers() {
                               {user.role}
                             </span>
                           </td>
-                          <td className="px-8 py-5 text-sm text-(--color-sage) font-medium">
+                          <td className="px-8 py-5 text-sm text-(--secondary) font-medium">
                             {new Date(user.createdAt).toLocaleDateString()}
                           </td>
                           <td className="px-8 py-5 text-right">

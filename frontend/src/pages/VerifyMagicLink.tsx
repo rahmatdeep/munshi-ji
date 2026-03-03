@@ -58,11 +58,11 @@ export default function VerifyMagicLink() {
   }, [searchParams, navigate]);
 
   return (
-    <div className="min-h-screen bg-[#ECE7D1] flex flex-col justify-center items-center p-4 selection:bg-(--color-tan) selection:text-(--foreground) relative overflow-hidden">
+    <div className="min-h-screen bg-(--background) flex flex-col justify-center items-center p-4 selection:bg-(--muted) selection:text-(--foreground) relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none opacity-50">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-(--color-tan) blur-3xl opacity-60" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-(--color-sage) blur-3xl opacity-40" />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-(--muted) blur-3xl opacity-60" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-(--secondary) blur-3xl opacity-40" />
       </div>
 
       <motion.div
@@ -82,7 +82,7 @@ export default function VerifyMagicLink() {
               <h1 className="font-serif-logo text-4xl md:text-5xl font-bold tracking-tight text-(--foreground)">
                 MUNSHI JI
               </h1>
-              <div className="h-0.5 w-12 bg-(--color-sage) mx-auto mt-4 rounded-full opacity-50"></div>
+              <div className="h-0.5 w-12 bg-(--secondary) mx-auto mt-4 rounded-full opacity-50"></div>
             </motion.div>
           </div>
 
@@ -95,7 +95,7 @@ export default function VerifyMagicLink() {
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
-                className="w-14 h-14 border-[3px] border-(--color-tan) border-t-(--color-brown) rounded-full mx-auto"
+                className="w-14 h-14 border-[3px] border-(--muted) border-t-(--primary) rounded-full mx-auto"
               />
               <div className="space-y-2">
                 <h2 className="text-xl font-medium text-(--foreground) tracking-tight">
@@ -118,7 +118,7 @@ export default function VerifyMagicLink() {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                className="w-16 h-16 bg-(--color-tan)/30 border border-(--color-tan) rounded-full flex items-center justify-center mx-auto text-(--color-sage) text-2xl font-bold"
+                className="w-16 h-16 bg-(--muted)/30 border border-(--muted) rounded-full flex items-center justify-center mx-auto text-(--secondary) text-2xl font-bold"
               >
                 ✓
               </motion.div>

@@ -163,16 +163,16 @@ export default function NotesSection({
         </div>
       )}
 
-      <div className="glass-card bg-white/40 p-6 md:p-8 rounded-3xl border border-(--color-tan)/30 shadow-2xl shadow-(--color-sage)/5 flex flex-col h-125 relative overflow-hidden group">
+      <div className="glass-card p-6 md:p-8 rounded-3xl border border-(--muted)/30 shadow-2xl shadow-5 flex flex-col h-125 relative overflow-hidden group">
         <div className="flex items-center gap-3 mb-6 relative z-10">
-          <div className="w-12 h-12 rounded-2xl bg-[#6B5A3A]/10 flex items-center justify-center border border-[#6B5A3A]/20 shadow-inner">
-            <FileText className="w-6 h-6 text-[#6B5A3A]" />
+          <div className="w-12 h-12 rounded-2xl bg-(--primary-hover)/10 flex items-center justify-center border border-(--primary-hover)/20 shadow-inner">
+            <FileText className="w-6 h-6 text-(--primary-hover)" />
           </div>
           <div>
             <h3 className="font-serif-logo font-bold text-2xl text-(--foreground) tracking-tight">
               Personal Notepad
             </h3>
-            <p className="text-[10px] text-(--color-sage) font-black uppercase tracking-widest">
+            <p className="text-[10px] text-(--secondary) font-black uppercase tracking-widest">
               Private Workspace
             </p>
           </div>
@@ -189,7 +189,7 @@ export default function NotesSection({
                 ? "Draft your private notes, strategies, or reminders here..."
                 : ""
             }
-            className={`w-full flex-1 resize-none bg-white/60 border-2 border-(--color-tan)/30 rounded-2xl p-6 pl-10 text-base leading-loose text-(--foreground) outline-none focus:border-(--color-brown) focus:ring-8 focus:ring-(--color-brown)/5 transition-all placeholder:text-(--color-sage)/50 font-medium ${!isSaved ? "cursor-not-allowed opacity-50" : ""}`}
+            className={`w-full flex-1 resize-none bg-white/60 border-2 border-(--muted)/30 rounded-2xl p-6 pl-10 text-base leading-loose text-(--foreground) outline-none focus:border-(--primary) focus:ring-8 focus:ring-(--primary)/5 transition-all placeholder:text-(--secondary)/50 font-medium ${!isSaved ? "cursor-not-allowed opacity-50" : ""}`}
             style={{
               backgroundImage: "linear-gradient(#f1eee0 1px, transparent 1px)",
               backgroundSize: "100% 2.5rem",
@@ -209,7 +209,7 @@ export default function NotesSection({
           <button
             onClick={handleSavePersonalNote}
             disabled={isSavingPersonal || !isSaved}
-            className="px-8 py-2.5 rounded-xl text-sm font-bold bg-(--primary) text-white hover:bg-[#726242] transition-all shadow-xl shadow-(--primary)/20 disabled:opacity-30 flex items-center gap-2 active:scale-95"
+            className="px-8 py-2.5 rounded-xl text-sm font-bold bg-(--primary) text-white hover:bg-(--primary-hover) transition-all shadow-xl shadow-(--primary)/20 disabled:opacity-30 flex items-center gap-2 active:scale-95"
           >
             {isSavingPersonal ? (
               <motion.div
@@ -230,7 +230,7 @@ export default function NotesSection({
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="glass-card bg-white p-6 rounded-2xl shadow-2xl border border-(--color-tan)/40"
+              className="glass-card bg-white p-6 rounded-2xl shadow-2xl border border-(--muted)/40"
             >
               <div className="w-12 h-12 bg-(--primary)/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Save className="w-6 h-6 text-(--primary)" />
@@ -238,7 +238,7 @@ export default function NotesSection({
               <p className="text-sm font-bold text-(--foreground) mb-1">
                 Personal Notepad Locked
               </p>
-              <p className="text-xs text-(--color-sage) font-medium">
+              <p className="text-xs text-(--secondary) font-medium">
                 Save this case to start drafting private notes.
               </p>
             </motion.div>
@@ -246,7 +246,7 @@ export default function NotesSection({
         )}
       </div>
 
-      <div className="glass-card bg-white/40 p-6 md:p-8 rounded-3xl border border-(--color-tan)/30 shadow-2xl shadow-(--color-sage)/5 flex flex-col h-125 relative overflow-hidden group">
+      <div className="glass-card p-6 md:p-8 rounded-3xl border border-(--muted)/30 shadow-2xl shadow-5 flex flex-col h-125 relative overflow-hidden group">
         <div className="flex items-center gap-3 mb-6 relative z-10">
           <div className="w-12 h-12 rounded-2xl bg-(--primary)/10 flex items-center justify-center border border-(--primary)/20 shadow-inner">
             <Users className="w-6 h-6 text-(--primary)" />
@@ -255,7 +255,7 @@ export default function NotesSection({
             <h3 className="font-serif-logo font-bold text-2xl text-(--foreground) tracking-tight">
               Collaborative Insights
             </h3>
-            <p className="text-[10px] text-(--color-sage) font-black uppercase tracking-widest">
+            <p className="text-[10px] text-(--secondary) font-black uppercase tracking-widest">
               Team Intelligence
             </p>
           </div>
@@ -264,11 +264,11 @@ export default function NotesSection({
         <div className="flex-1 overflow-y-auto pr-2 space-y-4 mb-4 custom-scrollbar relative z-10">
           {sharedNotes.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center opacity-40">
-              <MessageSquare className="w-16 h-16 text-(--color-sage) mb-4" />
+              <MessageSquare className="w-16 h-16 text-(--secondary) mb-4" />
               <p className="text-sm font-bold text-(--foreground)">
                 The record is clear.
               </p>
-              <p className="text-xs text-(--color-sage) mt-1 max-w-50 font-medium font-sans">
+              <p className="text-xs text-(--secondary) mt-1 max-w-50 font-medium font-sans">
                 Be the first to share an insight with the team.
               </p>
             </div>
@@ -280,12 +280,12 @@ export default function NotesSection({
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   key={note.id}
-                  className={`p-5 rounded-2xl ${isAuthor ? "bg-(--primary)/5 border border-(--primary)/10 ml-10" : "bg-white border border-(--color-tan)/30 mr-10"} shadow-sm transition-all hover:shadow-md`}
+                  className={`p-5 rounded-2xl ${isAuthor ? "bg-(--primary)/5 border border-(--primary)/10 ml-10" : "bg-white border border-(--muted)/30 mr-10"} shadow-sm transition-all hover:shadow-md`}
                 >
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex items-center gap-2">
                       <div
-                        className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${isAuthor ? "bg-(--primary) text-white" : "bg-(--color-tan) text-(--primary)"}`}
+                        className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${isAuthor ? "bg-(--primary) text-white" : "bg-(--muted) text-(--primary)"}`}
                       >
                         {(note.user?.name ||
                           note.user?.email ||
@@ -295,7 +295,7 @@ export default function NotesSection({
                         <span className="text-xs font-black text-(--foreground) leading-none">
                           {note.user?.name || note.user?.email}
                         </span>
-                        <span className="text-[9px] text-(--color-sage) font-bold uppercase tracking-tighter mt-0.5">
+                        <span className="text-[9px] text-(--secondary) font-bold uppercase tracking-tighter mt-0.5">
                           {new Date(note.createdAt).toLocaleDateString()} at{" "}
                           {new Date(note.createdAt).toLocaleTimeString([], {
                             hour: "2-digit",
@@ -307,7 +307,7 @@ export default function NotesSection({
                     {isAuthor && isSaved && (
                       <button
                         onClick={() => handleDeleteSharedNote(note.id)}
-                        className="text-(--color-sage) hover:text-red-500 transition-colors p-1"
+                        className="text-(--secondary) hover:text-red-500 transition-colors p-1"
                         title="Remove entry"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -336,12 +336,12 @@ export default function NotesSection({
               placeholder={
                 isSaved ? "Contribute to the legal strategy..." : "Locked"
               }
-              className={`w-full bg-white/80 border-2 border-(--color-tan)/50 rounded-3xl pl-6 pr-14 py-4 text-sm font-bold text-(--foreground) outline-none focus:border-(--primary) focus:ring-8 focus:ring-(--primary)/5 transition-all placeholder:text-(--color-sage)/40 ${!isSaved ? "cursor-not-allowed opacity-50" : ""}`}
+              className={`w-full bg-white/80 border-2 border-(--muted)/50 rounded-3xl pl-6 pr-14 py-4 text-sm font-bold text-(--foreground) outline-none focus:border-(--primary) focus:ring-8 focus:ring-(--primary)/5 transition-all placeholder:text-(--secondary)/40 ${!isSaved ? "cursor-not-allowed opacity-50" : ""}`}
             />
             <button
               type="submit"
               disabled={!newSharedContent.trim() || isPostingShared || !isSaved}
-              className="absolute right-2.5 top-2.5 p-2 bg-(--primary) text-white rounded-xl hover:bg-[#726242] disabled:opacity-20 transition-all shadow-lg active:scale-90"
+              className="absolute right-2.5 top-2.5 p-2 bg-(--primary) text-white rounded-xl hover:bg-(--primary-hover) disabled:opacity-20 transition-all shadow-lg active:scale-90"
             >
               {isPostingShared ? (
                 <motion.div
@@ -361,7 +361,7 @@ export default function NotesSection({
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="glass-card bg-white p-6 rounded-2xl shadow-2xl border border-(--color-tan)/40"
+              className="glass-card bg-white p-6 rounded-2xl shadow-2xl border border-(--muted)/40"
             >
               <div className="w-12 h-12 bg-(--primary)/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Users className="w-6 h-6 text-(--primary)" />
@@ -369,7 +369,7 @@ export default function NotesSection({
               <p className="text-sm font-bold text-(--foreground) mb-1">
                 Collaboration Locked
               </p>
-              <p className="text-xs text-(--color-sage) font-medium">
+              <p className="text-xs text-(--secondary) font-medium">
                 Save this case to join the discussion board.
               </p>
             </motion.div>

@@ -112,30 +112,30 @@ export default function CaseDetails() {
   };
 
   return (
-    <div className="min-h-screen bg-[#ECE7D1] flex flex-col selection:bg-(--color-tan) selection:text-(--foreground) relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-(--background) flex flex-col selection:bg-(--muted) selection:text-(--foreground) relative overflow-hidden font-sans">
       {/* Background elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none opacity-50">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-(--color-tan) blur-3xl opacity-60 mix-blend-multiply" />
-        <div className="absolute top-[30%] right-[-10%] w-[40%] h-[40%] rounded-full bg-(--color-sage) blur-3xl opacity-30 mix-blend-multiply" />
-        <div className="absolute bottom-[-10%] left-[20%] w-[50%] h-[50%] rounded-full bg-[#f4f1e5] blur-3xl opacity-70" />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-(--muted) blur-3xl opacity-60 mix-blend-multiply" />
+        <div className="absolute top-[30%] right-[-10%] w-[40%] h-[40%] rounded-full bg-(--secondary) blur-3xl opacity-30 mix-blend-multiply" />
+        <div className="absolute bottom-[-10%] left-[20%] w-[50%] h-[50%] rounded-full bg-(--muted-bg) blur-3xl opacity-70" />
       </div>
 
       {/* Header */}
-      <header className="px-6 md:px-12 py-5 flex justify-between items-center relative z-20 w-full backdrop-blur-md border-b border-(--color-tan)/40 bg-white/20">
+      <header className="px-6 md:px-12 py-5 flex justify-between items-center relative z-20 w-full backdrop-blur-md border-b border-(--muted)/40 bg-white/20">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
           className="flex items-center gap-4"
         >
-          <div className="w-12 h-12 rounded-xl bg-linear-to-br from-(--primary) to-[#6B5A3A] text-(--primary-fg) flex items-center justify-center font-serif-logo font-bold text-2xl shadow-xl shadow-(--primary)/20 border border-(--primary)/30">
+          <div className="w-12 h-12 rounded-xl bg-linear-to-br from-(--primary) to-(--primary-hover) text-(--primary-fg) flex items-center justify-center font-serif-logo font-bold text-2xl shadow-xl shadow-(--primary)/20 border border-(--primary)/30">
             M
           </div>
           <div>
             <h1 className="font-serif-logo text-2xl md:text-3xl font-bold tracking-tight text-(--foreground) leading-none mb-1">
               MUNSHI JI
             </h1>
-            <p className="text-[10px] md:text-xs text-(--color-sage) font-bold tracking-[0.2em] uppercase">
+            <p className="text-[10px] md:text-xs text-(--secondary) font-bold tracking-[0.2em] uppercase">
               Legal Operating System
             </p>
           </div>
@@ -165,7 +165,7 @@ export default function CaseDetails() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="text-center my-auto flex flex-col items-center justify-center glass-card rounded-3xl p-12 bg-white/30 border-white/50 max-w-md mx-auto mt-20"
+              className="text-center my-auto flex flex-col items-center justify-center glass-card rounded-3xl p-12 max-w-md mx-auto mt-20"
             >
               <div className="relative mb-6">
                 <motion.div
@@ -175,7 +175,7 @@ export default function CaseDetails() {
                     repeat: Infinity,
                     ease: "linear",
                   }}
-                  className="w-16 h-16 border-[3px] border-(--color-tan)/30 border-t-(--primary) rounded-full"
+                  className="w-16 h-16 border-[3px] border-(--muted)/30 border-t-(--primary) rounded-full"
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <Briefcase className="w-5 h-5 text-(--primary) animate-pulse" />
@@ -184,7 +184,7 @@ export default function CaseDetails() {
               <h3 className="text-lg font-bold text-(--foreground) mb-1">
                 Loading Case Details
               </h3>
-              <p className="text-sm font-medium text-(--color-sage)">
+              <p className="text-sm font-medium text-(--secondary)">
                 Retrieving full case dossier...
               </p>
             </motion.div>
@@ -264,7 +264,7 @@ export default function CaseDetails() {
                     <button
                       onClick={handleSave}
                       disabled={isSaving}
-                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold shadow-md transition-all bg-(--primary) hover:bg-[#726242] text-(--primary-fg) shadow-(--primary)/20 hover:-translate-y-0.5 disabled:opacity-80 disabled:cursor-not-allowed"
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold shadow-md transition-all bg-(--primary) hover:bg-(--primary-hover) text-(--primary-fg) shadow-(--primary)/20 hover:-translate-y-0.5 disabled:opacity-80 disabled:cursor-not-allowed"
                     >
                       {isSaving ? (
                         <motion.div

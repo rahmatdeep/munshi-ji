@@ -107,11 +107,11 @@ export default function CaseView({
 
   return (
     <div className="w-full flex flex-col gap-6">
-      <div className="glass-card rounded-3xl p-8 md:p-10 border-white/50 bg-white/40 shadow-xl shadow-(--color-sage)/5">
+      <div className="glass-card rounded-3xl p-8 md:p-10 shadow-5">
         <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <span className="px-3 py-1.5 rounded-lg text-xs font-black tracking-widest bg-(--color-sage)/20 text-(--primary) border border-(--color-sage)/30 shadow-sm">
+              <span className="px-3 py-1.5 rounded-lg text-xs font-black tracking-widest bg-(--secondary)/20 text-(--primary) border border-(--secondary)/30 shadow-sm">
                 {dispCaseType} - {dispCaseNo} / {dispCaseYear}
               </span>
               {status && (
@@ -124,7 +124,7 @@ export default function CaseView({
             <h2 className="text-3xl md:text-5xl font-serif-logo font-bold text-(--foreground) leading-tight mb-2">
               {petName}
             </h2>
-            <p className="text-(--color-sage) italic text-xl md:text-2xl font-serif-logo my-1">
+            <p className="text-(--secondary) italic text-xl md:text-2xl font-serif-logo my-1">
               versus
             </p>
             <h2 className="text-3xl md:text-5xl font-serif-logo font-bold text-(--foreground) leading-tight">
@@ -135,11 +135,11 @@ export default function CaseView({
           <div className="flex items-center self-start mt-2">{children}</div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 pt-8 border-t border-(--color-tan)/30">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 pt-8 border-t border-(--muted)/30">
           {/* Meta Group 1 */}
           <div className="space-y-4">
             <div className="bg-white/40 rounded-2xl p-4 border border-white/50 hover:bg-white/60 transition-colors">
-              <p className="text-[10px] text-(--color-sage) uppercase tracking-[0.2em] font-bold mb-1 flex items-center gap-2">
+              <p className="text-[10px] text-(--secondary) uppercase tracking-[0.2em] font-bold mb-1 flex items-center gap-2">
                 <Briefcase className="w-3 h-3" /> Registration Date
               </p>
               <p className="text-sm font-semibold text-(--foreground)">
@@ -149,7 +149,7 @@ export default function CaseView({
               </p>
             </div>
             <div className="bg-white/40 rounded-2xl p-4 border border-white/50 hover:bg-white/60 transition-colors">
-              <p className="text-[10px] text-(--color-sage) uppercase tracking-[0.2em] font-bold mb-1 flex items-center gap-2">
+              <p className="text-[10px] text-(--secondary) uppercase tracking-[0.2em] font-bold mb-1 flex items-center gap-2">
                 <Calendar className="w-3 h-3" /> Next Listing Date
               </p>
               <p className="text-sm font-semibold text-(--foreground)">
@@ -159,13 +159,13 @@ export default function CaseView({
               </p>
             </div>
             <div className="bg-white/40 rounded-2xl p-4 border border-white/50 hover:bg-white/60 transition-colors">
-              <p className="text-[10px] text-(--color-sage) uppercase tracking-[0.2em] font-bold mb-1 flex items-center gap-2">
+              <p className="text-[10px] text-(--secondary) uppercase tracking-[0.2em] font-bold mb-1 flex items-center gap-2">
                 <CheckCircle className="w-3 h-3" /> Status
               </p>
               <p className="text-sm font-semibold text-(--foreground) leading-tight">
                 {status || "Not specified"}{" "}
                 {disposalDate && (
-                  <span className="text-xs text-(--color-sage) block mt-1">
+                  <span className="text-xs text-(--secondary) block mt-1">
                     on {new Date(disposalDate).toLocaleDateString()}
                   </span>
                 )}
@@ -176,20 +176,20 @@ export default function CaseView({
           {/* Meta Group 2 */}
           <div className="space-y-4">
             <div className="bg-white/40 rounded-2xl p-4 border border-white/50 hover:bg-white/60 transition-colors">
-              <p className="text-[10px] text-(--color-sage) uppercase tracking-[0.2em] font-bold mb-1 flex items-center gap-2">
+              <p className="text-[10px] text-(--secondary) uppercase tracking-[0.2em] font-bold mb-1 flex items-center gap-2">
                 <Hash className="w-3 h-3" /> CNR / Diary No
               </p>
               <div className="text-sm font-semibold text-(--foreground)">
                 <span className="font-mono block truncate" title={cnrNo}>
                   {cnrNo}
                 </span>
-                <span className="text-xs text-(--color-sage) block mt-1">
+                <span className="text-xs text-(--secondary) block mt-1">
                   Diary: {diaryNo}
                 </span>
               </div>
             </div>
             <div className="bg-white/40 rounded-2xl p-4 border border-white/50 hover:bg-white/60 transition-colors">
-              <p className="text-[10px] text-(--color-sage) uppercase tracking-[0.2em] font-bold mb-1 flex items-center gap-2">
+              <p className="text-[10px] text-(--secondary) uppercase tracking-[0.2em] font-bold mb-1 flex items-center gap-2">
                 <FileText className="w-3 h-3" /> Category
               </p>
               <p className="text-sm font-semibold text-(--foreground) leading-snug">
@@ -197,7 +197,7 @@ export default function CaseView({
               </p>
             </div>
             <div className="bg-white/40 rounded-2xl p-4 border border-white/50 hover:bg-white/60 transition-colors">
-              <p className="text-[10px] text-(--color-sage) uppercase tracking-[0.2em] font-bold mb-1 flex items-center gap-2">
+              <p className="text-[10px] text-(--secondary) uppercase tracking-[0.2em] font-bold mb-1 flex items-center gap-2">
                 <Search className="w-3 h-3" /> District
               </p>
               <p className="text-sm font-semibold text-(--foreground)">
@@ -209,7 +209,7 @@ export default function CaseView({
           {/* Meta Group 3 */}
           <div className="space-y-4">
             <div className="bg-white/40 rounded-2xl p-4 border border-white/50 hover:bg-white/60 transition-colors">
-              <p className="text-[10px] text-(--color-sage) uppercase tracking-[0.2em] font-bold mb-1">
+              <p className="text-[10px] text-(--secondary) uppercase tracking-[0.2em] font-bold mb-1">
                 Petitioner Counsel
               </p>
               <p className="text-sm font-semibold text-(--foreground)">
@@ -217,7 +217,7 @@ export default function CaseView({
               </p>
             </div>
             <div className="bg-white/40 rounded-2xl p-4 border border-white/50 hover:bg-white/60 transition-colors">
-              <p className="text-[10px] text-(--color-sage) uppercase tracking-[0.2em] font-bold mb-1">
+              <p className="text-[10px] text-(--secondary) uppercase tracking-[0.2em] font-bold mb-1">
                 Respondent Counsel
               </p>
               <p className="text-sm font-semibold text-(--foreground)">
@@ -225,7 +225,7 @@ export default function CaseView({
               </p>
             </div>
             <div className="bg-white/40 rounded-2xl p-4 border border-white/50 hover:bg-white/60 transition-colors">
-              <p className="text-[10px] text-(--color-sage) uppercase tracking-[0.2em] font-bold mb-1">
+              <p className="text-[10px] text-(--secondary) uppercase tracking-[0.2em] font-bold mb-1">
                 Bench Info
               </p>
               <p className="text-xs font-semibold text-(--foreground) leading-snug">
@@ -239,21 +239,21 @@ export default function CaseView({
       {/* Listings & Judgments */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-12 w-full">
         {hearings.length > 0 && (
-          <div className="glass-card rounded-3xl p-6 border-white/50 bg-white/40 h-full">
-            <h3 className="text-sm uppercase tracking-widest font-bold text-(--color-sage) mb-4 flex items-center gap-2">
+          <div className="glass-card rounded-3xl p-6 h-full">
+            <h3 className="text-sm uppercase tracking-widest font-bold text-(--secondary) mb-4 flex items-center gap-2">
               <Calendar className="w-4 h-4" /> Case Listing Details
             </h3>
-            <div className="overflow-x-auto rounded-xl border border-(--color-tan)/30 bg-white/30 hidden-scrollbar">
+            <div className="overflow-x-auto rounded-xl border border-(--muted)/30 bg-white/30 hidden-scrollbar">
               <table className="w-full text-left text-xs text-(--foreground)">
-                <thead className="bg-white/50 border-b border-(--color-tan)/30 whitespace-nowrap">
+                <thead className="bg-white/50 border-b border-(--muted)/30 whitespace-nowrap">
                   <tr>
-                    <th className="px-4 py-3 font-bold text-(--color-sage) uppercase tracking-wider">
+                    <th className="px-4 py-3 font-bold text-(--secondary) uppercase tracking-wider">
                       Cause List Date
                     </th>
-                    <th className="px-4 py-3 font-bold text-(--color-sage) uppercase tracking-wider">
+                    <th className="px-4 py-3 font-bold text-(--secondary) uppercase tracking-wider">
                       Type / Sr No
                     </th>
-                    <th className="px-4 py-3 font-bold text-(--color-sage) uppercase tracking-wider">
+                    <th className="px-4 py-3 font-bold text-(--secondary) uppercase tracking-wider">
                       Bench
                     </th>
                   </tr>
@@ -262,7 +262,7 @@ export default function CaseView({
                   {hearings.map((h: any, i: number) => (
                     <tr
                       key={i}
-                      className="border-b border-(--color-tan)/20 last:border-0 hover:bg-white/20 transition-colors"
+                      className="border-b border-(--muted)/20 last:border-0 hover:bg-white/20 transition-colors"
                     >
                       <td className="px-4 py-3 font-medium whitespace-nowrap">
                         {h.hearingDate
@@ -287,24 +287,24 @@ export default function CaseView({
         )}
 
         {orders.length > 0 && (
-          <div className="glass-card rounded-3xl p-6 border-white/50 bg-white/40 h-full">
-            <h3 className="text-sm uppercase tracking-widest font-bold text-(--color-sage) mb-4 flex items-center gap-2">
+          <div className="glass-card rounded-3xl p-6 h-full">
+            <h3 className="text-sm uppercase tracking-widest font-bold text-(--secondary) mb-4 flex items-center gap-2">
               <FileText className="w-4 h-4" /> Judgment Details
             </h3>
-            <div className="overflow-x-auto rounded-xl border border-(--color-tan)/30 bg-white/30 hidden-scrollbar">
+            <div className="overflow-x-auto rounded-xl border border-(--muted)/30 bg-white/30 hidden-scrollbar">
               <table className="w-full text-left text-xs text-(--foreground)">
-                <thead className="bg-white/50 border-b border-(--color-tan)/30 whitespace-nowrap">
+                <thead className="bg-white/50 border-b border-(--muted)/30 whitespace-nowrap">
                   <tr>
-                    <th className="px-4 py-3 font-bold text-(--color-sage) uppercase tracking-wider">
+                    <th className="px-4 py-3 font-bold text-(--secondary) uppercase tracking-wider">
                       Order Date
                     </th>
-                    <th className="px-4 py-3 font-bold text-(--color-sage) uppercase tracking-wider">
+                    <th className="px-4 py-3 font-bold text-(--secondary) uppercase tracking-wider">
                       Type
                     </th>
-                    <th className="px-4 py-3 font-bold text-(--color-sage) uppercase tracking-wider">
+                    <th className="px-4 py-3 font-bold text-(--secondary) uppercase tracking-wider">
                       Bench
                     </th>
-                    <th className="px-4 py-3 font-bold text-(--color-sage) uppercase tracking-wider text-right">
+                    <th className="px-4 py-3 font-bold text-(--secondary) uppercase tracking-wider text-right">
                       Action
                     </th>
                   </tr>
@@ -313,7 +313,7 @@ export default function CaseView({
                   {orders.map((o: any, i: number) => (
                     <tr
                       key={i}
-                      className="border-b border-(--color-tan)/20 last:border-0 hover:bg-white/20 transition-colors"
+                      className="border-b border-(--muted)/20 last:border-0 hover:bg-white/20 transition-colors"
                     >
                       <td className="px-4 py-3 font-medium whitespace-nowrap">
                         {o.orderDate
@@ -353,13 +353,13 @@ export default function CaseView({
         )}
       </div>
 
-      <details className="group glass-card rounded-3xl border-white/50 bg-white/20 mb-12">
+      <details className="group glass-card rounded-3xl mb-12">
         <summary className="px-8 py-5 text-sm font-bold text-(--foreground) cursor-pointer select-none transition-colors flex items-center outline-none">
-          <FileText className="w-4 h-4 mr-3 text-(--color-sage)" />
+          <FileText className="w-4 h-4 mr-3 text-(--secondary)" />
           View Complete Raw Payload
-          <ChevronRight className="w-4 h-4 ml-auto text-(--color-sage) transform transition-transform group-open:rotate-90" />
+          <ChevronRight className="w-4 h-4 ml-auto text-(--secondary) transform transition-transform group-open:rotate-90" />
         </summary>
-        <div className="p-8 pt-0 overflow-x-auto border-t border-(--color-tan)/20">
+        <div className="p-8 pt-0 overflow-x-auto border-t border-(--muted)/20">
           <pre className="text-xs text-(--foreground) font-mono leading-relaxed bg-white/40 p-6 rounded-2xl shadow-inner wrap-break-word whitespace-pre-wrap mt-6">
             {JSON.stringify(caseData, null, 2)}
           </pre>

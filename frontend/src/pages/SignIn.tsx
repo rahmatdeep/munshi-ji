@@ -42,11 +42,11 @@ export default function SignIn() {
   };
 
   return (
-    <div className="min-h-screen bg-[#ECE7D1] flex flex-col justify-center items-center p-4 selection:bg-(--color-tan) selection:text-(--foreground) relative overflow-hidden">
+    <div className="min-h-screen bg-(--background) flex flex-col justify-center items-center p-4 selection:bg-(--muted) selection:text-(--foreground) relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none opacity-50">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-(--color-tan) blur-3xl opacity-60" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-(--color-sage) blur-3xl opacity-40" />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-(--muted) blur-3xl opacity-60" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-(--secondary) blur-3xl opacity-40" />
       </div>
 
       <motion.div
@@ -66,7 +66,7 @@ export default function SignIn() {
               <h1 className="font-serif-logo text-4xl md:text-5xl font-bold tracking-tight text-(--foreground)">
                 MUNSHI JI
               </h1>
-              <div className="h-0.5 w-12 bg-(--color-sage) mx-auto mt-4 rounded-full opacity-50"></div>
+              <div className="h-0.5 w-12 bg-(--secondary) mx-auto mt-4 rounded-full opacity-50"></div>
             </motion.div>
 
             <h2 className="text-xl font-medium text-(--foreground) tracking-tight mb-2">
@@ -84,7 +84,7 @@ export default function SignIn() {
               animate={{ opacity: 1, y: 0 }}
               className="text-center space-y-4"
             >
-              <div className="w-16 h-16 bg-(--color-tan)/30 border border-(--color-tan) rounded-full flex items-center justify-center mx-auto text-(--color-sage) text-2xl font-bold">
+              <div className="w-16 h-16 bg-(--muted)/30 border border-(--muted) rounded-full flex items-center justify-center mx-auto text-(--secondary) text-2xl font-bold">
                 ✓
               </div>
               <div className="space-y-2">
@@ -99,7 +99,7 @@ export default function SignIn() {
                 </p>
                 <button
                   onClick={() => setStatus("idle")}
-                  className="text-sm text-(--color-sage) hover:text-(--foreground) font-medium transition-colors"
+                  className="text-sm text-(--secondary) hover:text-(--foreground) font-medium transition-colors"
                 >
                   Try a different email
                 </button>
@@ -115,7 +115,7 @@ export default function SignIn() {
                   Email address
                 </label>
                 <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-(--muted-fg) group-focus-within:text-(--color-brown) transition-colors text-lg font-medium font-serif-logo">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-(--muted-fg) group-focus-within:text-(--primary) transition-colors text-lg font-medium font-serif-logo">
                     @
                   </div>
                   <input

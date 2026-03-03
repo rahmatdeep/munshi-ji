@@ -102,30 +102,30 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#ECE7D1] flex flex-col selection:bg-(--color-tan) selection:text-(--foreground) relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-(--background) flex flex-col selection:bg-(--muted) selection:text-(--foreground) relative overflow-hidden font-sans">
       {/* Background elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none opacity-50">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-(--color-tan) blur-3xl opacity-60 mix-blend-multiply" />
-        <div className="absolute top-[30%] right-[-10%] w-[40%] h-[40%] rounded-full bg-(--color-sage) blur-3xl opacity-30 mix-blend-multiply" />
-        <div className="absolute bottom-[-10%] left-[20%] w-[50%] h-[50%] rounded-full bg-[#f4f1e5] blur-3xl opacity-70" />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-(--muted) blur-3xl opacity-60 mix-blend-multiply" />
+        <div className="absolute top-[30%] right-[-10%] w-[40%] h-[40%] rounded-full bg-(--secondary) blur-3xl opacity-30 mix-blend-multiply" />
+        <div className="absolute bottom-[-10%] left-[20%] w-[50%] h-[50%] rounded-full bg-(--muted-bg) blur-3xl opacity-70" />
       </div>
 
       {/* Header */}
-      <header className="px-6 md:px-12 py-5 flex justify-between items-center relative z-20 w-full backdrop-blur-md border-b border-(--color-tan)/40 bg-white/20">
+      <header className="px-6 md:px-12 py-5 flex justify-between items-center relative z-20 w-full backdrop-blur-md border-b border-(--muted)/40 bg-white/20">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
           className="flex items-center gap-4"
         >
-          <div className="w-12 h-12 rounded-xl bg-linear-to-br from-(--primary) to-[#6B5A3A] text-(--primary-fg) flex items-center justify-center font-serif-logo font-bold text-2xl shadow-xl shadow-(--primary)/20 border border-(--primary)/30">
+          <div className="w-12 h-12 rounded-xl bg-linear-to-br from-(--primary) to-(--primary-hover) text-(--primary-fg) flex items-center justify-center font-serif-logo font-bold text-2xl shadow-xl shadow-(--primary)/20 border border-(--primary)/30">
             M
           </div>
           <div>
             <h1 className="font-serif-logo text-2xl md:text-3xl font-bold tracking-tight text-(--foreground) leading-none mb-1">
               MUNSHI JI
             </h1>
-            <p className="text-[10px] md:text-xs text-(--color-sage) font-bold tracking-[0.2em] uppercase">
+            <p className="text-[10px] md:text-xs text-(--secondary) font-bold tracking-[0.2em] uppercase">
               Legal Operating System
             </p>
           </div>
@@ -168,10 +168,10 @@ export default function Dashboard() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
             onClick={handleLogout}
-            className="group flex items-center gap-2 text-sm font-semibold text-(--foreground) transition-all border-2 border-(--color-tan) px-5 py-2.5 rounded-full hover:bg-(--color-tan)/30 hover:shadow-md hover:-translate-y-0.5"
+            className="group flex items-center gap-2 text-sm font-semibold text-(--foreground) transition-all border-2 border-(--muted) px-5 py-2.5 rounded-full hover:bg-(--muted)/30 hover:shadow-md hover:-translate-y-0.5"
           >
             <span className="hidden sm:inline">Sign Out</span>
-            <LogOut className="w-4 h-4 text-(--color-sage) group-hover:text-(--foreground) transition-colors" />
+            <LogOut className="w-4 h-4 text-(--secondary) group-hover:text-(--foreground) transition-colors" />
           </motion.button>
         </div>
       </header>
@@ -185,7 +185,7 @@ export default function Dashboard() {
           <h2 className="text-3xl font-serif-logo font-bold text-(--foreground) tracking-tight mb-2">
             My Dashboard
           </h2>
-          <p className="text-sm font-medium text-(--color-sage) leading-relaxed">
+          <p className="text-sm font-medium text-(--secondary) leading-relaxed">
             Manage and track your saved cases.
           </p>
         </motion.div>
@@ -199,7 +199,7 @@ export default function Dashboard() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="text-center my-auto flex flex-col items-center justify-center glass-card rounded-3xl p-12 bg-white/30 border-white/50 max-w-md mx-auto"
+                className="text-center my-auto flex flex-col items-center justify-center glass-card rounded-3xl p-12 max-w-md mx-auto"
               >
                 <div className="relative mb-6">
                   <motion.div
@@ -209,7 +209,7 @@ export default function Dashboard() {
                       repeat: Infinity,
                       ease: "linear",
                     }}
-                    className="w-16 h-16 border-[3px] border-(--color-tan)/30 border-t-(--primary) rounded-full"
+                    className="w-16 h-16 border-[3px] border-(--muted)/30 border-t-(--primary) rounded-full"
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <Briefcase className="w-5 h-5 text-(--primary) animate-pulse" />
@@ -218,7 +218,7 @@ export default function Dashboard() {
                 <h3 className="text-lg font-bold text-(--foreground) mb-1">
                   Loading Dashboard
                 </h3>
-                <p className="text-sm font-medium text-(--color-sage)">
+                <p className="text-sm font-medium text-(--secondary)">
                   Retrieving your saved cases...
                 </p>
               </motion.div>
@@ -260,7 +260,7 @@ export default function Dashboard() {
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.2, type: "spring" }}
-                    className="w-24 h-24 rounded-3xl bg-linear-to-br from-white to-(--color-tan)/30 border border-white shadow-2xl shadow-(--primary)/5 flex items-center justify-center relative z-10"
+                    className="w-24 h-24 rounded-3xl bg-linear-to-br from-white to-(--muted)/30 border border-white shadow-2xl shadow-(--primary)/5 flex items-center justify-center relative z-10"
                   >
                     <Briefcase className="w-10 h-10 text-(--primary)" />
                   </motion.div>
@@ -270,7 +270,7 @@ export default function Dashboard() {
                 <h3 className="text-3xl font-serif-logo font-bold text-(--foreground) mb-4 tracking-tight">
                   Your Legal Command Center Awaits
                 </h3>
-                <p className="text-base font-medium text-(--color-sage) leading-relaxed mb-10 max-w-lg mx-auto">
+                <p className="text-base font-medium text-(--secondary) leading-relaxed mb-10 max-w-lg mx-auto">
                   Your dashboard is currently an open brief. Start by searching
                   for active cases to track their status, collaborate with your
                   team, and organize your litigation strategy.
@@ -279,7 +279,7 @@ export default function Dashboard() {
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                   <button
                     onClick={() => navigate("/search")}
-                    className="w-full sm:w-auto min-w-50 flex justify-center items-center gap-3 py-4 px-8 rounded-2xl shadow-xl shadow-(--primary)/20 text-sm font-bold text-(--primary-fg) bg-(--primary) hover:bg-[#726242] hover:-translate-y-1 active:scale-[0.98] transition-all"
+                    className="w-full sm:w-auto min-w-50 flex justify-center items-center gap-3 py-4 px-8 rounded-2xl shadow-xl shadow-(--primary)/20 text-sm font-bold text-(--primary-fg) bg-(--primary) hover:bg-(--primary-hover) hover:-translate-y-1 active:scale-[0.98] transition-all"
                   >
                     <Search className="w-5 h-5" />
                     Begin New Search
@@ -308,10 +308,10 @@ export default function Dashboard() {
                     key={c.id}
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="glass-card rounded-3xl p-6 border-white/50 bg-white/40 shadow-xl shadow-(--color-sage)/5 flex flex-col group hover:bg-white/60 transition-all duration-300"
+                    className="glass-card rounded-3xl p-6 shadow-5 flex flex-col group hover: transition-all duration-300"
                   >
                     <div className="flex items-start justify-between mb-4 gap-2">
-                      <span className="px-2.5 py-1 rounded-md text-[10px] font-black tracking-widest bg-(--color-sage)/20 text-(--primary) border border-(--color-sage)/30 self-start">
+                      <span className="px-2.5 py-1 rounded-md text-[10px] font-black tracking-widest bg-(--secondary)/20 text-(--primary) border border-(--secondary)/30 self-start">
                         {c.caseType} {c.caseNo}/{c.caseYear}
                       </span>
                       <button
@@ -327,7 +327,7 @@ export default function Dashboard() {
                       <h3 className="text-lg font-serif-logo font-bold text-(--foreground) leading-tight mb-1 line-clamp-2">
                         {c.petName || "Petitioner"}
                       </h3>
-                      <p className="text-[10px] text-(--color-sage) italic font-serif-logo my-1">
+                      <p className="text-[10px] text-(--secondary) italic font-serif-logo my-1">
                         vs
                       </p>
                       <h3 className="text-lg font-serif-logo font-bold text-(--foreground) leading-tight line-clamp-2">
@@ -335,9 +335,9 @@ export default function Dashboard() {
                       </h3>
                     </div>
 
-                    <div className="space-y-3 pt-4 border-t border-(--color-tan)/30 mt-auto">
+                    <div className="space-y-3 pt-4 border-t border-(--muted)/30 mt-auto">
                       <div className="flex items-center justify-between">
-                        <p className="text-[10px] text-(--color-sage) uppercase tracking-[0.2em] font-bold flex items-center gap-1.5">
+                        <p className="text-[10px] text-(--secondary) uppercase tracking-[0.2em] font-bold flex items-center gap-1.5">
                           <CheckCircle className="w-3 h-3" /> Status
                         </p>
                         <p className="text-xs font-semibold text-(--foreground)">
@@ -345,7 +345,7 @@ export default function Dashboard() {
                         </p>
                       </div>
                       <div className="flex items-center justify-between">
-                        <p className="text-[10px] text-(--color-sage) uppercase tracking-[0.2em] font-bold flex items-center gap-1.5">
+                        <p className="text-[10px] text-(--secondary) uppercase tracking-[0.2em] font-bold flex items-center gap-1.5">
                           <Calendar className="w-3 h-3" /> Next Hearing
                         </p>
                         <p className="text-xs font-semibold text-(--foreground)">
@@ -355,7 +355,7 @@ export default function Dashboard() {
                         </p>
                       </div>
                       <div className="flex items-center justify-between">
-                        <p className="text-[10px] text-(--color-sage) uppercase tracking-[0.2em] font-bold flex items-center gap-1.5">
+                        <p className="text-[10px] text-(--secondary) uppercase tracking-[0.2em] font-bold flex items-center gap-1.5">
                           <Hash className="w-3 h-3" /> Diary No.
                         </p>
                         <p className="text-xs font-semibold text-(--foreground)">
