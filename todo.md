@@ -1,4 +1,4 @@
-- realted cases CRM-M
+- related cases CRM-M, there is a related cases fied in some of the cases which should also be displayed now
 - data fields maybe invalid court number can be string or number
 - date format
 - CL list pdf -> search cases with
