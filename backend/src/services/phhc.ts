@@ -197,7 +197,7 @@ export async function storePHHCCase(input: FetchCaseInput, data: FullPHHCCaseDat
             srNo: h.sr_no,
             listType: h.cl_type,
             hearingStatus: h.hearing_status,
-            courtNo: h.court_no,
+            courtNo: h.court_no?.toString() ?? null,
         }));
 
         if (hearings.length > 0) {

@@ -49,7 +49,7 @@ export interface HearingItem {
   sr_no: number | null;
   cl_type: string | null;
   hearing_status: string | null;
-  court_no: string | null;
+  court_no: string | number | null;
   benchDetails: {
     bench_name: string | null;
   } | null;
