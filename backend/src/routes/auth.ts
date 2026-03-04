@@ -112,6 +112,7 @@ router.post(
         userId: user.id,
         email: user.email,
         name: user.name,
+        lawyerId: user.lawyerId,
         role: user.role as "ADMIN" | "USER",
       };
 
@@ -145,7 +146,7 @@ router.post(
       return res.status(400).json({ errors: result.error.issues });
     }
 
-    const { email, name, role } = result.data;
+    const { email, name, lawyerId, role } = result.data;
 
     try {
       const existingUser = await prisma.user.findUnique({
@@ -160,6 +161,7 @@ router.post(
         data: {
           email,
           name,
+          lawyerId,
           role: role as any,
         },
       });
@@ -170,6 +172,7 @@ router.post(
           id: newUser.id,
           email: newUser.email,
           name: newUser.name,
+          lawyerId: newUser.lawyerId,
           role: newUser.role,
         },
       });

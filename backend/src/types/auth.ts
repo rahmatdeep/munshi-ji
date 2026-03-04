@@ -11,6 +11,7 @@ export const verifyMagicLinkSchema = z.object({
 export const registerSchema = z.object({
   email: z.string().email("Invalid email address"),
   name: z.string().optional(),
+  lawyerId: z.string().min(1, "Lawyer ID is required"),
   role: z.enum(["ADMIN", "USER"]).optional().default("USER"),
 });
 
@@ -22,5 +23,6 @@ export interface UserPayload {
   userId: string;
   email: string;
   name?: string | null;
+  lawyerId: string;
   role: "ADMIN" | "USER";
 }

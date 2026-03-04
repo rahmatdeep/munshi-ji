@@ -3,13 +3,17 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
+  // Clear existing data to ensure a clean state for mandatory fields
+  await prisma.user.deleteMany({});
+  
   const admin = await prisma.user.upsert({
-    where: { email: "falguni4782@gmail.com" },
+    where: { email: "rahmatdeep@gmail.com" },
     update: {},
     create: {
-      email: "falguni4782@gmail.com",
-      name: "Falguni",
+      email: "rahmatdeep@gmail.com",
+      name: "Rahmatdeep",
       role: "ADMIN",
+      lawyerId: "ADM/001/2026", // Default ID for admin
     },
   });
 

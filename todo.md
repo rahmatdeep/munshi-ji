@@ -1,8 +1,6 @@
 - related cases CRM-M, there is a related cases fied in some of the cases which should also be displayed now
-- data fields maybe invalid court number can be string or number
 - date format
 - CL list pdf -> search cases with
-- save lawyer id in db
 - https://new.phhc.gov.in/case-status/advocate-name get all cases by id
 - add option to create drafts with ai
 
