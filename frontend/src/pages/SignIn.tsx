@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import axios from "axios";
 import { API_URL } from "../lib/api";
 import { useNavigate } from "react-router-dom";
+import { Mail } from "lucide-react";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -115,17 +116,15 @@ export default function SignIn() {
                   Email address
                 </label>
                 <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-(--muted-fg) group-focus-within:text-(--primary) transition-colors text-lg font-medium font-serif-logo">
-                    @
-                  </div>
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-(--secondary) group-focus-within:text-(--primary) transition-colors" />
                   <input
                     id="email"
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="glass-input block w-full pl-10 pr-3 py-2.5 text-sm rounded-xl outline-none"
-                    placeholder="name@example.com"
+                    placeholder="john@example.com"
+                    className="w-full bg-white/60 border border-(--color-tan-500)/60 rounded-xl pl-11 pr-4 py-3 text-sm outline-none focus:bg-white focus:border-(--primary) focus:ring-4 focus:ring-(--primary)/15 transition-all"
                   />
                 </div>
               </div>
