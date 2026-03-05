@@ -73,12 +73,28 @@ export interface ObjectionResponse {
   data: Record<string, unknown>[];
 }
 
+export interface RelatedCase {
+  case_documents: {
+    id: number;
+    case_type: string;
+    case_no: string;
+    case_year: number;
+    pet_name: string;
+    res_name: string;
+    diary_no: string | number;
+    casetype_name: string;
+    [key: string]: any;
+  };
+  order_details: any[];
+}
+
 export interface FullPHHCCaseData {
   caseData: CaseResponse;
   hearingData: HearingResponse;
   ordersData: OrderItem[];
   objectionsData: ObjectionResponse;
   appealData: unknown[];
+  relatedData: RelatedCase[];
 }
 
 export const VALID_CASE_TYPES = [

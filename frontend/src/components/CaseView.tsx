@@ -105,6 +105,14 @@ export default function CaseView({
       }))
     : caseData.orders || [];
 
+  const relatedCases =
+    caseData.relatedData ||
+    caseData.rawData?.relatedData ||
+    caseData.rawData?.caseResponse?.relatedData ||
+    [];
+
+  console.log("relatedCases", relatedCases);
+
   return (
     <div className="w-full flex flex-col gap-6">
       <div className="glass-card rounded-3xl p-8 md:p-10 shadow-5">
@@ -236,8 +244,8 @@ export default function CaseView({
         </div>
       </div>
 
-      {/* Listings & Judgments */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-12 w-full">
+      {/* Listings, Judgments & Related Cases */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
         {hearings.length > 0 && (
           <div className="glass-card rounded-3xl p-6 h-full">
             <h3 className="text-sm uppercase tracking-widest font-bold text-(--secondary) mb-4 flex items-center gap-2">
@@ -348,6 +356,51 @@ export default function CaseView({
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+        )}
+
+        {relatedCases.length > 0 && (
+          <div className="glass-card rounded-3xl p-6 h-full md:col-span-2">
+            <h3 className="text-sm uppercase tracking-widest font-bold text-(--secondary) mb-4 flex items-center gap-2">
+              <Search className="w-4 h-4" /> Related Cases (Connected)
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {relatedCases.map((rc: any, i: number) => {
+                const doc = rc.case_documents || {};
+                return (
+                  <div
+                    key={i}
+                    className="bg-white/40 p-4 rounded-2xl border border-white/50 hover:bg-white/60 transition-all group"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-black tracking-widest bg-(--secondary)/10 text-(--primary) px-2 py-0.5 rounded-md">
+                        {doc.case_type || "N/A"}-{doc.case_no}/{doc.case_year}
+                      </span>
+                      <span className="text-[10px] font-bold text-(--secondary) opacity-60">
+                        {doc.cnr_no || "No CNR"}
+                      </span>
+                    </div>
+                    <h4 className="text-xs font-bold text-(--foreground) line-clamp-2 mb-3 leading-snug">
+                      {doc.partyname ||
+                        `${doc.pet_name || "Petitioner"} vs ${doc.res_name || "Respondent"}`}
+                    </h4>
+                    <div className="flex items-center justify-between mt-auto pt-2 border-t border-(--muted)/20">
+                      <span className="text-[10px] font-mono text-(--secondary)">
+                        Diary: {doc.case_diary_no}
+                      </span>
+                      <button
+                        onClick={() => {
+                          window.location.href = `/search`;
+                        }}
+                        className="text-[10px] font-bold text-(--primary) flex items-center gap-1 hover:underline underline-offset-2"
+                      >
+                        Search <ChevronRight className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

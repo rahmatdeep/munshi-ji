@@ -18,6 +18,7 @@ import {
   PartyDetail,
   HearingItem,
   FullPHHCCaseData,
+  RelatedCase,
 } from "../types/phhc";
 
 /**
@@ -43,12 +44,20 @@ export async function fetchPHHCCase(
 ): Promise<FullPHHCCaseData | null> {
   const { case_type, case_no, case_year } = input;
 
-  // 1. Fetch all 5 endpoints in parallel
-  const [caseData, hearingData, ordersData, objectionsData, appealData] =
+  // 1. Fetch main case data first to get the internal ID
+  const caseData = await phhcFetch<CaseResponse>(
+    `${PHHC_API_BASE}/cis_filing/public/getCase?case_no=${case_no}&case_type=${case_type}&case_year=${case_year}`,
+  );
+
+  if (!caseData || !caseData.id || !caseData.case_no) {
+    return null;
+  }
+
+  const internalId = caseData.id;
+
+  // 2. Fetch all other endpoints in parallel using the internal ID or case criteria
+  const [hearingData, ordersData, objectionsData, appealData, relatedData] =
     await Promise.all([
-      phhcFetch<CaseResponse>(
-        `${PHHC_API_BASE}/cis_filing/public/getCase?case_no=${case_no}&case_type=${case_type}&case_year=${case_year}`,
-      ),
       phhcFetch<HearingResponse>(
         `${PHHC_API_BASE}/case_listing_detail/public/search?case_no=${case_no}&case_year=${case_year}&case_type=${case_type}`,
       ),
@@ -61,14 +70,10 @@ export async function fetchPHHCCase(
       phhcFetch<unknown[]>(
         `${PHHC_API_BASE}/cis_filing/public/fetchDetailsOfAppeal?pcase_no=${case_no}&pcase_year=${case_year}&pcase_type=${case_type}`,
       ),
+      phhcFetch<RelatedCase[]>(
+        `${PHHC_API_BASE}/cis_filing/public/relatedCases?caseDetail_id=${internalId}&limit=1000`,
+      ),
     ]);
-
-  // Check if case exists on PHHC (caseData is usually present but maybe empty?)
-  // Based on previous code, if caseData exists we proceed.
-  // Usually caseData.cnr_no or similar would be missing if not found.
-  if (!caseData || !caseData.case_no) {
-    return null;
-  }
 
   return {
     caseData,
@@ -76,6 +81,7 @@ export async function fetchPHHCCase(
     ordersData,
     objectionsData,
     appealData,
+    relatedData,
   };
 }
 
@@ -87,8 +93,14 @@ export async function storePHHCCase(
   data: FullPHHCCaseData,
 ) {
   const { case_type, case_no, case_year } = input;
-  const { caseData, hearingData, ordersData, objectionsData, appealData } =
-    data;
+  const {
+    caseData,
+    hearingData,
+    ordersData,
+    objectionsData,
+    appealData,
+    relatedData,
+  } = data;
 
   // Upsert the case inside a transaction
   return prisma.$transaction(async (tx) => {
@@ -125,7 +137,9 @@ export async function storePHHCCase(
         rawData: {
           caseResponse: caseData,
           appealData,
-        } as Prisma.InputJsonValue,
+          relatedData,
+        } as unknown as Prisma.InputJsonValue,
+        // TODO: add better typing
       },
       create: {
         caseType: case_type,
@@ -154,7 +168,9 @@ export async function storePHHCCase(
         rawData: {
           caseResponse: caseData,
           appealData,
-        } as Prisma.InputJsonValue,
+          relatedData,
+        } as unknown as Prisma.InputJsonValue,
+        // TODO: add better typing
       },
     });
 
