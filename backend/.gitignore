@@ -23,6 +23,7 @@ debug.log
 /src/generated/prisma
 /prisma/*.db
 /prisma/*.db-journal
+/prisma/seed.ts
 
 # IDEs and Editors
 .vscode/
