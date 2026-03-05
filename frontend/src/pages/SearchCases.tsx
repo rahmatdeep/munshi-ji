@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import { API_URL } from "../lib/api";
@@ -154,10 +154,16 @@ const VALID_CASE_TYPES = [
   "XOBJS",
 ];
 
+import { useSearchParams } from "react-router-dom";
 export default function SearchCases() {
-  const [caseType, setCaseType] = useState("CWP");
-  const [caseNo, setCaseNo] = useState("");
-  const [caseYear, setCaseYear] = useState(new Date().getFullYear().toString());
+  const [searchParams] = useSearchParams();
+  // navigate is removed as it's not used
+
+  const [caseType, setCaseType] = useState(searchParams.get("type") || "");
+  const [caseNo, setCaseNo] = useState(searchParams.get("no") || "");
+  const [caseYear, setCaseYear] = useState(
+    searchParams.get("year") || new Date().getFullYear().toString(),
+  );
   const [status, setStatus] = useState<
     "idle" | "loading" | "success" | "error"
   >("idle");
@@ -169,45 +175,80 @@ export default function SearchCases() {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!caseType || !caseNo || !caseYear) return;
+  const handleSearch = useCallback(
+    async (e?: React.FormEvent) => {
+      if (e) e.preventDefault();
+      if (!caseType || !caseNo || !caseYear) return;
 
-    setStatus("loading");
-    setError("");
-    setCaseData(null);
+      setStatus("loading");
+      setError("");
+      setCaseData(null);
 
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.post(
-        `${API_URL}/api/cases/fetch`,
-        {
-          case_type: caseType,
-          case_no: caseNo,
-          case_year: parseInt(caseYear, 10),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.post(
+          `${API_URL}/api/cases/fetch`,
+          {
+            case_type: caseType,
+            case_no: caseNo,
+            case_year: parseInt(caseYear, 10),
           },
-        },
-      );
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
 
-      setCaseData(response.data.case);
-      setIsSaved(response.data.isSaved || false);
-      setSavedCaseId(response.data.caseId || null);
-      setStatus("success");
-      setSaveSuccess(false); // Reset save state on new search
-    } catch (err: any) {
-      console.error("Fetch error:", err);
-      setError(
-        err.response?.data?.error ||
-          err.response?.data?.message ||
-          "Failed to fetch case. Please try again.",
-      );
-      setStatus("error");
+        setCaseData(response.data.case);
+        setIsSaved(response.data.isSaved || false);
+        setSavedCaseId(response.data.caseId || null);
+        setStatus("success");
+        setSaveSuccess(false); // Reset save state on new search
+      } catch (err: any) {
+        console.error("Fetch error:", err);
+        setError(
+          err.response?.data?.error ||
+            err.response?.data?.message ||
+            "Failed to fetch case. Please try again.",
+        );
+        setStatus("error");
+      }
+    },
+    [caseType, caseNo, caseYear],
+  );
+
+  useEffect(() => {
+    const type = searchParams.get("type");
+    const no = searchParams.get("no");
+    const year = searchParams.get("year");
+
+    if (type && no && year) {
+      setCaseType(type);
+      setCaseNo(no);
+      setCaseYear(year);
+      // We need to trigger handleSearch, but the state updates are async.
+      // So we can't call handleSearch with the current state.
+      // We can either call handleSearch with the values directly or wait for state sync.
+      // Let's call it direct if possible or just use the dependency array of another effect.
     }
-  };
+  }, [searchParams]);
+
+  useEffect(() => {
+    const type = searchParams.get("type");
+    const no = searchParams.get("no");
+    const year = searchParams.get("year");
+    if (
+      type &&
+      no &&
+      year &&
+      caseType === type &&
+      caseNo === no &&
+      caseYear === year
+    ) {
+      handleSearch();
+    }
+  }, [caseType, caseNo, caseYear, handleSearch, searchParams]);
 
   const handleSaveCase = async () => {
     if (!caseData) return;
@@ -296,7 +337,7 @@ export default function SearchCases() {
           </div>
 
           <form
-            onSubmit={handleSubmit}
+            onSubmit={handleSearch}
             className="flex flex-col md:flex-row gap-4 items-end"
           >
             <div className="w-full md:flex-1 space-y-2">
@@ -350,7 +391,8 @@ export default function SearchCases() {
                 max={new Date().getFullYear()}
                 value={caseYear}
                 onChange={(e) => setCaseYear(e.target.value)}
-                className="w-full bg-white/50 border-2 border-(--muted)/50 rounded-xl px-4 py-3 text-sm font-semibold text-(--foreground) outline-none focus:border-(--primary) focus:ring-4 focus:ring-(--primary)/10 transition-all"
+                className="w-full bg-white/50 border-2 border-(--muted)/50 rounded-xl px-4 py-3 text-sm font-semibold text-(--foreground) outline-none focus:border-(--primary) focus:ring-4 focus:ring-(--primary)/10 transition-all placeholder:text-(--muted) placeholder:font-normal"
+                placeholder="Enter Year"
               />
             </div>
 

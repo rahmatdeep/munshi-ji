@@ -18,6 +18,7 @@ export interface PartyDetail {
 }
 
 export interface CaseResponse {
+  id?: number | string;
   pet_name: string | null;
   res_name: string | null;
   pet_adv_name: string | null;
@@ -39,7 +40,6 @@ export interface CaseResponse {
   establishments: { name: string } | null;
   petitionerDetails: PartyDetail[] | null;
   respondentDetails: PartyDetail[] | null;
-  [key: string]: unknown;
 }
 
 export interface HearingItem {
@@ -83,7 +83,6 @@ export interface RelatedCase {
     res_name: string;
     diary_no: string | number;
     casetype_name: string;
-    [key: string]: any;
   };
   order_details: any[];
 }

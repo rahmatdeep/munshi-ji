@@ -8,9 +8,10 @@ import {
   Search,
   ChevronRight,
 } from "lucide-react";
+import type { FullPHHCCaseData } from "../../../backend/src/types/phhc";
 
 interface CaseViewProps {
-  caseData: any;
+  caseData: FullPHHCCaseData | any;
   caseType?: string;
   caseNo?: string;
   caseYear?: string;
@@ -391,7 +392,10 @@ export default function CaseView({
                       </span>
                       <button
                         onClick={() => {
-                          window.location.href = `/search`;
+                          window.open(
+                            `/search?type=${doc.case_type}&no=${doc.case_no}&year=${doc.case_year}`,
+                            "_blank",
+                          );
                         }}
                         className="text-[10px] font-bold text-(--primary) flex items-center gap-1 hover:underline underline-offset-2"
                       >

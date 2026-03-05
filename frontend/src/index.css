@@ -95,3 +95,13 @@
     @apply bg-(--secondary) text-(--secondary-fg) hover:bg-(--secondary-hover) shadow-lg shadow-(--secondary)/20 hover:shadow-xl hover:shadow-(--secondary)/30 transition-all duration-300 rounded-xl px-6 py-3 font-bold active:scale-[0.98];
   }
 }
+
+@layer base {
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"] {
+    -webkit-appearance: none;
+    margin: 0;
+    -moz-appearance: textfield !important;
+  }
+}

@@ -66,12 +66,12 @@ const Dropdown: React.FC<DropdownProps> = ({
         }`}
       >
         <span
-          className={`block truncate ${!selectedOption ? "text-(--muted-fg)" : "text-(--foreground)"}`}
+          className={`block truncate text-sm font-semibold ${!selectedOption ? "text-(--muted)" : "text-(--foreground)"}`}
         >
           {selectedOption ? selectedOption.label : placeholder}
         </span>
         <ChevronDown
-          className={`w-5 h-5 text-(--muted-fg) transition-transform duration-300 ${
+          className={`w-5 h-5 text-(--muted) transition-transform duration-300 ${
             isOpen
               ? "rotate-180 text-(--primary)"
               : "group-hover:text-(--foreground)"
