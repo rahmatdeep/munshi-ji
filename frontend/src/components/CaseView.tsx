@@ -69,7 +69,9 @@ export default function CaseView({
 
   const cnrNo = caseData.cnrNo || rawCore?.cnr_no || "N/A";
   const diaryNo =
+    caseData.diaryNo ||
     caseData.filingNo ||
+    rawCore?.case_diary_no ||
     caseData.rawData?.caseResponse?.case_diary_no ||
     rawCore?.filling_no ||
     "N/A";
@@ -122,7 +124,7 @@ export default function CaseView({
           <div>
             <div className="flex items-center gap-3 mb-4">
               <span className="px-3 py-1.5 rounded-lg text-xs font-black tracking-widest bg-(--secondary)/20 text-(--primary) border border-(--secondary)/30 shadow-sm">
-                {dispCaseType} - {dispCaseNo} / {dispCaseYear}
+                {dispCaseType} {dispCaseNo} / {dispCaseYear}
               </span>
               {status && (
                 <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-(--primary) text-(--primary-fg) shadow-sm">
