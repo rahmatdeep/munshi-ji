@@ -12,6 +12,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { useConfirm } from "../hooks/useConfirm";
+import { formatDate } from "../lib/date";
 
 interface Note {
   id: string;
@@ -312,7 +313,7 @@ export default function NotesSection({
                           {note.user?.name || note.user?.email}
                         </span>
                         <span className="text-[9px] text-(--secondary) font-bold uppercase tracking-tighter mt-0.5">
-                          {new Date(note.createdAt).toLocaleDateString()} at{" "}
+                          {formatDate(note.createdAt)} at{" "}
                           {new Date(note.createdAt).toLocaleTimeString([], {
                             hour: "2-digit",
                             minute: "2-digit",

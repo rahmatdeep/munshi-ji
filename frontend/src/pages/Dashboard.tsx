@@ -14,6 +14,7 @@ import {
   Search,
 } from "lucide-react";
 import { useConfirm } from "../hooks/useConfirm";
+import { formatDate } from "../lib/date";
 
 export default function Dashboard() {
   const [status, setStatus] = useState<
@@ -270,7 +271,7 @@ export default function Dashboard() {
                       </p>
                       <p className="text-xs font-semibold text-(--foreground)">
                         {c.nextListingDate
-                          ? new Date(c.nextListingDate).toLocaleDateString()
+                          ? formatDate(c.nextListingDate)
                           : "TBD"}
                       </p>
                     </div>

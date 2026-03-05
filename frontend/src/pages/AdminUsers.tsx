@@ -16,6 +16,7 @@ import {
   Trash2,
 } from "lucide-react";
 import Dropdown from "../components/ui/Dropdown";
+import { formatDate } from "../lib/date";
 
 interface UserData {
   id: string;
@@ -299,7 +300,7 @@ export default function AdminUsers() {
                             </span>
                           </td>
                           <td className="px-8 py-5 text-sm text-(--secondary) font-medium">
-                            {new Date(user.createdAt).toLocaleDateString()}
+                            {formatDate(user.createdAt)}
                           </td>
                           <td className="px-8 py-5 text-right">
                             <button

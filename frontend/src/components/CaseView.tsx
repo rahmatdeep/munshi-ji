@@ -9,6 +9,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import type { FullPHHCCaseData } from "../../../backend/src/types/phhc";
+import { formatDate } from "../lib/date";
 
 interface CaseViewProps {
   caseData: FullPHHCCaseData | any;
@@ -152,9 +153,7 @@ export default function CaseView({
                 <Briefcase className="w-3 h-3" /> Registration Date
               </p>
               <p className="text-sm font-semibold text-(--foreground)">
-                {regDate
-                  ? new Date(regDate).toLocaleDateString()
-                  : "Not specified"}
+                {regDate ? formatDate(regDate) : "Not specified"}
               </p>
             </div>
             <div className="bg-white/40 rounded-2xl p-4 border border-white/50 hover:bg-white/60 transition-colors">
@@ -162,9 +161,7 @@ export default function CaseView({
                 <Calendar className="w-3 h-3" /> Next Listing Date
               </p>
               <p className="text-sm font-semibold text-(--foreground)">
-                {nextListingDate
-                  ? new Date(nextListingDate).toLocaleDateString()
-                  : "Not required"}
+                {nextListingDate ? formatDate(nextListingDate) : "Not required"}
               </p>
             </div>
             <div className="bg-white/40 rounded-2xl p-4 border border-white/50 hover:bg-white/60 transition-colors">
@@ -175,7 +172,7 @@ export default function CaseView({
                 {status || "Not specified"}{" "}
                 {disposalDate && (
                   <span className="text-xs text-(--secondary) block mt-1">
-                    on {new Date(disposalDate).toLocaleDateString()}
+                    on {formatDate(disposalDate)}
                   </span>
                 )}
               </p>
@@ -274,9 +271,7 @@ export default function CaseView({
                       className="border-b border-(--muted)/20 last:border-0 hover:bg-white/20 transition-colors"
                     >
                       <td className="px-4 py-3 font-medium whitespace-nowrap">
-                        {h.hearingDate
-                          ? new Date(h.hearingDate).toLocaleDateString()
-                          : "N/A"}
+                        {h.hearingDate ? formatDate(h.hearingDate) : "N/A"}
                       </td>
                       <td className="px-4 py-3">
                         {h.listType} : {h.srNo}
@@ -325,9 +320,7 @@ export default function CaseView({
                       className="border-b border-(--muted)/20 last:border-0 hover:bg-white/20 transition-colors"
                     >
                       <td className="px-4 py-3 font-medium whitespace-nowrap">
-                        {o.orderDate
-                          ? new Date(o.orderDate).toLocaleDateString()
-                          : "N/A"}
+                        {o.orderDate ? formatDate(o.orderDate) : "N/A"}
                       </td>
                       <td className="px-4 py-3">
                         {o.orderType === "F" ? "Final Order" : o.orderType}
