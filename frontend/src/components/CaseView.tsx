@@ -90,6 +90,16 @@ export default function CaseView({
   const benchName =
     caseData.benchName || rawCore?.bench_name || "Not specified";
 
+  const mapListType = (code?: string) => {
+    if (!code) return "Not specified";
+    if (code === "U") return "Urgent";
+    if (code === "O") return "Ordinary";
+    return code;
+  };
+  const listTypeStr = caseData.listType || mapListType(rawCore?.list_type);
+  const mainCaseFillingNo =
+    caseData.mainCaseNo || rawCore?.main_case_filling_no;
+
   // Normalize Arrays
   const hearings = isRawPHHC
     ? (caseData.hearingData?.data || []).map((h: any) => ({
@@ -179,6 +189,14 @@ export default function CaseView({
                 )}
               </p>
             </div>
+            <div className="bg-white/40 rounded-2xl p-4 border border-white/50 hover:bg-white/60 transition-colors">
+              <p className="text-[10px] text-(--secondary) uppercase tracking-[0.2em] font-bold mb-1 flex items-center gap-2">
+                <Briefcase className="w-3 h-3" /> List Type
+              </p>
+              <p className="text-sm font-semibold text-(--foreground)">
+                {listTypeStr}
+              </p>
+            </div>
           </div>
 
           {/* Meta Group 2 */}
@@ -212,6 +230,31 @@ export default function CaseView({
                 {district}
               </p>
             </div>
+            {mainCaseFillingNo && (
+              <div className="bg-white/40 rounded-2xl p-4 border border-white/50 hover:bg-white/60 transition-colors">
+                <p className="text-[10px] text-(--secondary) uppercase tracking-[0.2em] font-bold mb-1 flex items-center gap-2">
+                  <FileText className="w-3 h-3" /> Main Case
+                </p>
+                <div className="text-sm font-semibold text-(--foreground)">
+                  {mainCaseFillingNo.split(",").length === 3 ? (
+                    <button
+                      onClick={() => {
+                        const parts = mainCaseFillingNo.split(",");
+                        window.open(
+                          `/search?type=${parts[0]}&no=${parts[1]}&year=${parts[2]}`,
+                          "_blank",
+                        );
+                      }}
+                      className="text-(--primary) hover:underline text-left cursor-pointer"
+                    >
+                      {mainCaseFillingNo.split(",").join(" ")}
+                    </button>
+                  ) : (
+                    <span>{mainCaseFillingNo}</span>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Meta Group 3 */}
