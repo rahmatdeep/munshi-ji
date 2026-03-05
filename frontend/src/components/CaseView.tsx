@@ -8,11 +8,10 @@ import {
   Search,
   ChevronRight,
 } from "lucide-react";
-import type { FullPHHCCaseData } from "../../../backend/src/types/phhc";
 import { formatDate } from "../lib/date";
 
 interface CaseViewProps {
-  caseData: FullPHHCCaseData | any;
+  caseData: any;
   caseType?: string;
   caseNo?: string;
   caseYear?: string;
