@@ -60,19 +60,34 @@ export async function fetchPHHCCase(
     await Promise.all([
       phhcFetch<HearingResponse>(
         `${PHHC_API_BASE}/case_listing_detail/public/search?case_no=${case_no}&case_year=${case_year}&case_type=${case_type}`,
-      ),
+      ).catch((e) => {
+        console.warn("Hearings fetch failed:", e.message);
+        return null;
+      }),
       phhcFetch<OrderItem[]>(
         `${PHHC_API_BASE}/cis_filing/public/judgmentDetails/${case_no}/${case_year}/${case_type}?skip=0&limit=1000`,
-      ),
+      ).catch((e) => {
+        console.warn("Orders fetch failed:", e.message);
+        return [];
+      }),
       phhcFetch<ObjectionResponse>(
         `${PHHC_API_BASE}/public/case-objections?case_no=${case_no}&case_year=${case_year}&case_type=${case_type}&skip=0&limit=200`,
-      ),
+      ).catch((e) => {
+        console.warn("Objections fetch failed:", e.message);
+        return null;
+      }),
       phhcFetch<unknown[]>(
         `${PHHC_API_BASE}/cis_filing/public/fetchDetailsOfAppeal?pcase_no=${case_no}&pcase_year=${case_year}&pcase_type=${case_type}`,
-      ),
+      ).catch((e) => {
+        console.warn("Appeals fetch failed:", e.message);
+        return [];
+      }),
       phhcFetch<RelatedCase[]>(
         `${PHHC_API_BASE}/cis_filing/public/relatedCases?caseDetail_id=${internalId}&limit=1000`,
-      ),
+      ).catch((e) => {
+        console.warn("Related cases fetch failed:", e.message);
+        return [];
+      }),
     ]);
 
   return {
@@ -211,7 +226,7 @@ export async function storePHHCCase(
     // ── Hearings: delete old & re-create ─────────────────────────
     await tx.caseHearing.deleteMany({ where: { caseId } });
 
-    const hearings = (hearingData.data ?? []).map((h: HearingItem) => ({
+    const hearings = (hearingData?.data ?? []).map((h: HearingItem) => ({
       caseId,
       hearingDate: new Date(h.cl_date),
       benchCode: h.bench_code,
@@ -247,7 +262,7 @@ export async function storePHHCCase(
     // ── Objections: delete old & re-create ───────────────────────
     await tx.caseObjection.deleteMany({ where: { caseId } });
 
-    const objections = (objectionsData.data ?? []).map((obj) => ({
+    const objections = (objectionsData?.data ?? []).map((obj) => ({
       caseId,
       rawData: obj as Prisma.InputJsonValue,
     }));

@@ -89,9 +89,9 @@ export interface RelatedCase {
 
 export interface FullPHHCCaseData {
   caseData: CaseResponse;
-  hearingData: HearingResponse;
+  hearingData: HearingResponse | null;
   ordersData: OrderItem[];
-  objectionsData: ObjectionResponse;
+  objectionsData: ObjectionResponse | null;
   appealData: unknown[];
   relatedData: RelatedCase[];
 }

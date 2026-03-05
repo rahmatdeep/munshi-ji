@@ -4,5 +4,4 @@
 - filter on dashboard
 - add option to create drafts with ai
 - if user does not exist in db (for magic link), throw error to fe
-- PHHC fetch error for the related case
 - better UI for Personal Notepad
