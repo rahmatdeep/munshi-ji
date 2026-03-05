@@ -43,9 +43,9 @@ export default function CaseView({
   const rawCore = isRawPHHC ? caseData.caseData : null;
 
   // Normalized Fields
-  const dispCaseType = caseType || caseData.caseType || rawCore?.case_type;
-  const dispCaseNo = caseNo || caseData.caseNo || rawCore?.case_no;
-  const dispCaseYear = caseYear || caseData.caseYear || rawCore?.case_year;
+  const dispCaseType = caseData.caseType || rawCore?.case_type || caseType;
+  const dispCaseNo = caseData.caseNo || rawCore?.case_no || caseNo;
+  const dispCaseYear = caseData.caseYear || rawCore?.case_year || caseYear;
 
   const status = caseData.status || rawCore?.status?.status_desc;
 
