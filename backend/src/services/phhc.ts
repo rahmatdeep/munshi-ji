@@ -19,6 +19,12 @@ import {
   HearingItem,
   FullPHHCCaseData,
   RelatedCase,
+  LacRecord,
+  FirRecord,
+  DistrictRecord,
+  CopyingRecord,
+  ComplaintRecord,
+  ImpugnedRecord,
 } from "../types/phhc";
 
 /**
@@ -38,13 +44,15 @@ async function phhcFetch<T>(url: string): Promise<T> {
 
 /**
  * Only fetches data from PHHC APIs. Does NOT touch the database.
+ * Endpoints are called conditionally based on the boolean flags
+ * returned by the getCase response.
  */
 export async function fetchPHHCCase(
   input: FetchCaseInput,
 ): Promise<FullPHHCCaseData | null> {
   const { case_type, case_no, case_year } = input;
 
-  // 1. Fetch main case data first to get the internal ID
+  // 1. Fetch main case data first to get the internal ID and flags
   const caseData = await phhcFetch<CaseResponse>(
     `${PHHC_API_BASE}/cis_filing/public/getCase?case_no=${case_no}&case_type=${case_type}&case_year=${case_year}`,
   );
@@ -55,48 +63,155 @@ export async function fetchPHHCCase(
 
   const internalId = caseData.id;
 
-  // 2. Fetch all other endpoints in parallel using the internal ID or case criteria
-  const [hearingData, ordersData, objectionsData, appealData, relatedData] =
-    await Promise.all([
-      phhcFetch<HearingResponse>(
+  // 2. Build promises — always-called endpoints
+  const objectionsPromise = phhcFetch<ObjectionResponse>(
+    `${PHHC_API_BASE}/public/case-objections?case_no=${case_no}&case_year=${case_year}&case_type=${case_type}&skip=0&limit=200`,
+  ).catch((e) => {
+    console.warn("Objections fetch failed:", e.message);
+    return null;
+  });
+
+  const appealPromise = phhcFetch<unknown[]>(
+    `${PHHC_API_BASE}/cis_filing/public/fetchDetailsOfAppeal?pcase_no=${case_no}&pcase_year=${case_year}&pcase_type=${case_type}`,
+  ).catch((e) => {
+    console.warn("Appeals fetch failed:", e.message);
+    return [];
+  });
+
+  const mediationPromise = phhcFetch<unknown>(
+    `${PHHC_API_BASE}/cis_filing/public/getMediationDetailsByCaseTypeCaseNoAndCaseYear?case_type=${case_type}&case_no=${case_no}&case_year=${case_year}`,
+  ).catch((e) => {
+    console.warn("Mediation fetch failed:", e.message);
+    return null;
+  });
+
+  // 3. Conditional endpoints based on flags
+  const hearingPromise = caseData.isCaseListingRecord
+    ? phhcFetch<HearingResponse>(
         `${PHHC_API_BASE}/case_listing_detail/public/search?case_no=${case_no}&case_year=${case_year}&case_type=${case_type}`,
       ).catch((e) => {
         console.warn("Hearings fetch failed:", e.message);
         return null;
-      }),
-      phhcFetch<OrderItem[]>(
+      })
+    : Promise.resolve(null);
+
+  const ordersPromise = caseData.isJudgementRecord
+    ? phhcFetch<OrderItem[]>(
         `${PHHC_API_BASE}/cis_filing/public/judgmentDetails/${case_no}/${case_year}/${case_type}?skip=0&limit=1000`,
       ).catch((e) => {
         console.warn("Orders fetch failed:", e.message);
-        return [];
-      }),
-      phhcFetch<ObjectionResponse>(
-        `${PHHC_API_BASE}/public/case-objections?case_no=${case_no}&case_year=${case_year}&case_type=${case_type}&skip=0&limit=200`,
-      ).catch((e) => {
-        console.warn("Objections fetch failed:", e.message);
-        return null;
-      }),
-      phhcFetch<unknown[]>(
-        `${PHHC_API_BASE}/cis_filing/public/fetchDetailsOfAppeal?pcase_no=${case_no}&pcase_year=${case_year}&pcase_type=${case_type}`,
-      ).catch((e) => {
-        console.warn("Appeals fetch failed:", e.message);
-        return [];
-      }),
-      phhcFetch<RelatedCase[]>(
+        return [] as OrderItem[];
+      })
+    : Promise.resolve([] as OrderItem[]);
+
+  const relatedPromise = caseData.isRelatedCaseRecord
+    ? phhcFetch<RelatedCase[]>(
         `${PHHC_API_BASE}/cis_filing/public/relatedCases?caseDetail_id=${internalId}&limit=1000`,
       ).catch((e) => {
         console.warn("Related cases fetch failed:", e.message);
-        return [];
-      }),
-    ]);
+        return [] as RelatedCase[];
+      })
+    : Promise.resolve([] as RelatedCase[]);
+
+  const lacPromise = caseData.isLacRecord
+    ? phhcFetch<LacRecord>(
+        `${PHHC_API_BASE}/cis_filing/public/getLACDetailsbyCaseNoCaseYearCaseDetails?case_no=${case_no}&case_year=${case_year}&case_type=${case_type}`,
+      ).catch((e) => {
+        console.warn("LAC fetch failed:", e.message);
+        return null;
+      })
+    : Promise.resolve(null);
+
+  const firPromise = caseData.isFirRecord
+    ? phhcFetch<FirRecord[]>(
+        `${PHHC_API_BASE}/cis_filing/public/FIR/${case_no}/${case_year}/${case_type}`,
+      ).catch((e) => {
+        console.warn("FIR fetch failed:", e.message);
+        return null;
+      })
+    : Promise.resolve(null);
+
+  const districtPromise = caseData.isDistrictRecord
+    ? phhcFetch<DistrictRecord[]>(
+        `${PHHC_API_BASE}/lct_dist_web/?case_no=${case_no}&case_year=${case_year}&case_type=${case_type}`,
+      ).catch((e) => {
+        console.warn("District fetch failed:", e.message);
+        return null;
+      })
+    : Promise.resolve(null);
+
+  const copyingPromise = caseData.isCopyingRecord
+    ? phhcFetch<CopyingRecord>(
+        `${PHHC_API_BASE}/HC-Copying-Applications-Case-Details-Public/?case_no=${case_no}&case_year=${case_year}&case_type=${case_type}`,
+      ).catch((e) => {
+        console.warn("Copying fetch failed:", e.message);
+        return null;
+      })
+    : Promise.resolve(null);
+
+  const complaintPromise = caseData.iscomplaintRecord
+    ? phhcFetch<ComplaintRecord>(
+        `${PHHC_API_BASE}/cis_filing/public/getComplainDetailsByCaseTypeCaseNumber?case_no=${case_no}&case_year=${case_year}&case_type=${case_type}`,
+      ).catch((e) => {
+        console.warn("Complaint fetch failed:", e.message);
+        return null;
+      })
+    : Promise.resolve(null);
+
+  const impugnedPromise = caseData.isImpugnedRecord
+    ? phhcFetch<ImpugnedRecord>(
+        `${PHHC_API_BASE}/cis_filing/public/getImpugnedOrderDetails?case_no=${case_no}&case_year=${case_year}&case_type=${case_type}`,
+      ).catch((e) => {
+        console.warn("Impugned fetch failed:", e.message);
+        return null;
+      })
+    : Promise.resolve(null);
+
+  // 4. Fire all in parallel
+  const [
+    objectionsData,
+    appealData,
+    mediationData,
+    hearingData,
+    ordersData,
+    relatedData,
+    lacData,
+    firData,
+    districtData,
+    copyingData,
+    complaintData,
+    impugnedData,
+  ] = await Promise.all([
+    objectionsPromise,
+    appealPromise,
+    mediationPromise,
+    hearingPromise,
+    ordersPromise,
+    relatedPromise,
+    lacPromise,
+    firPromise,
+    districtPromise,
+    copyingPromise,
+    complaintPromise,
+    impugnedPromise,
+  ]);
 
   return {
     caseData,
+    // Always called
+    appealData,
+    objectionsData,
+    mediationData,
+    // Conditional
     hearingData,
     ordersData,
-    objectionsData,
-    appealData,
     relatedData,
+    lacData,
+    firData,
+    districtData,
+    copyingData,
+    complaintData,
+    impugnedData,
   };
 }
 
@@ -115,7 +230,27 @@ export async function storePHHCCase(
     objectionsData,
     appealData,
     relatedData,
+    mediationData,
+    lacData,
+    firData,
+    districtData,
+    copyingData,
+    complaintData,
+    impugnedData,
   } = data;
+
+  const rawData = {
+    caseResponse: caseData,
+    appealData,
+    relatedData,
+    mediationData,
+    lacData,
+    firData,
+    districtData,
+    copyingData,
+    complaintData,
+    impugnedData,
+  } as unknown as Prisma.InputJsonValue;
 
   // Upsert the case inside a transaction
   return prisma.$transaction(async (tx) => {
@@ -129,8 +264,8 @@ export async function storePHHCCase(
         },
       },
       update: {
-        cnrNo: caseData.cnr_no,
-        filingNo: caseData.filling_no,
+        cnrNo: caseData.cnr_no?.toString() ?? null,
+        filingNo: caseData.filling_no?.toString() ?? null,
         regDate: caseData.reg_date ? new Date(caseData.reg_date) : null,
         petName: caseData.pet_name,
         resName: caseData.res_name,
@@ -149,19 +284,14 @@ export async function storePHHCCase(
           ? new Date(caseData.disposal_date)
           : null,
         disposalType: caseData.disposal_type,
-        rawData: {
-          caseResponse: caseData,
-          appealData,
-          relatedData,
-        } as unknown as Prisma.InputJsonValue,
-        // TODO: add better typing
+        rawData,
       },
       create: {
         caseType: case_type,
         caseNo: case_no,
         caseYear: case_year,
-        cnrNo: caseData.cnr_no,
-        filingNo: caseData.filling_no,
+        cnrNo: caseData.cnr_no?.toString() ?? null,
+        filingNo: caseData.filling_no?.toString() ?? null,
         regDate: caseData.reg_date ? new Date(caseData.reg_date) : null,
         petName: caseData.pet_name,
         resName: caseData.res_name,
@@ -180,12 +310,7 @@ export async function storePHHCCase(
           ? new Date(caseData.disposal_date)
           : null,
         disposalType: caseData.disposal_type,
-        rawData: {
-          caseResponse: caseData,
-          appealData,
-          relatedData,
-        } as unknown as Prisma.InputJsonValue,
-        // TODO: add better typing
+        rawData,
       },
     });
 
@@ -292,3 +417,4 @@ export async function fetchAndStorePHHCCase(input: FetchCaseInput) {
   if (!data) return null;
   return storePHHCCase(input, data);
 }
+

@@ -23,8 +23,8 @@ export interface CaseResponse {
   res_name: string | null;
   pet_adv_name: string | null;
   res_adv_name: string | null;
-  cnr_no: string | null;
-  filling_no: string | null;
+  cnr_no: string | number | null;
+  filling_no: string | number | null;
   reg_date: string | null;
   bench_name: string | null;
   listing_or_proposal_date: string | null;
@@ -32,7 +32,7 @@ export interface CaseResponse {
   disposal_type: string | null;
   category: number | null;
   cat_desc: string | null;
-  case_no: string;
+  case_no: string | number;
   case_year: number;
   case_type: string;
   status: { status_desc: string } | null;
@@ -40,6 +40,15 @@ export interface CaseResponse {
   establishments: { name: string } | null;
   petitionerDetails: PartyDetail[] | null;
   respondentDetails: PartyDetail[] | null;
+  isLacRecord: boolean;
+  isFirRecord: boolean;
+  isJudgementRecord: boolean;
+  isCaseListingRecord: boolean;
+  isRelatedCaseRecord: boolean;
+  isDistrictRecord: boolean;
+  isCopyingRecord: boolean;
+  iscomplaintRecord: boolean;
+  isImpugnedRecord: boolean;
 }
 
 export interface HearingItem {
@@ -77,7 +86,7 @@ export interface RelatedCase {
   case_documents: {
     id: number;
     case_type: string;
-    case_no: string;
+    case_no: string | number;
     case_year: number;
     pet_name: string;
     res_name: string;
@@ -87,13 +96,87 @@ export interface RelatedCase {
   order_details: any[];
 }
 
+export interface LacRecord {
+  award_no: string | number | null;
+  award_date: string | null;
+  section_4_date: string | null;
+  section_6_date: string | null;
+  village: string | null;
+  district: string | null;
+  judge_name: string | null;
+  public_purpose: string | null;
+}
+
+export interface FirRecord {
+  case_no: string | number;
+  case_year: number;
+  case_type: string;
+  section: string | null;
+  fir_no: string | number | null;
+  fir_date: string | null;
+  police_stn: string | null;
+  dist_code: number | null;
+  pol_stn_code: number | null;
+  case_info_id: number | null;
+  district_name: string | null;
+}
+
+export interface DistrictRecord {
+  dist_code: number | null;
+  district_name: string | null;
+  lct_name: string | null;
+  lct_type: string | null;
+  lct_no: string | number | null;
+  lct_ord_date: string | null;
+  lct_year: number | null;
+  court_type: string | null;
+}
+
+export interface CopyingRecord {
+  items: {
+    pet_date: string | null;
+    petrf_no: number | null;
+    pet_type: string | null;
+    pet_code: string | null;
+    applname: string | null;
+    pet_status: string | null;
+  }[];
+}
+
+export interface ComplaintRecord {
+  data: {
+    comp_no: string | number | null;
+    comp_date: string | null;
+    comp_name: string | null;
+    police_stn: string | null;
+    district_name: string | null;
+    section: string | null;
+  }[];
+}
+
+export interface ImpugnedRecord {
+  order_date: string | null;
+  authority: string | null;
+  district: string | null;
+  order_type: string | null;
+}
+
 export interface FullPHHCCaseData {
   caseData: CaseResponse;
+  // Always called
+  appealData: unknown[];
+  objectionsData: ObjectionResponse | null;
+  mediationData: unknown;
+  // Conditional on flags
   hearingData: HearingResponse | null;
   ordersData: OrderItem[];
-  objectionsData: ObjectionResponse | null;
-  appealData: unknown[];
   relatedData: RelatedCase[];
+  lacData: LacRecord | null;
+  firData: FirRecord[] | null;
+  districtData: DistrictRecord[] | null;
+  copyingData: CopyingRecord | null;
+  complaintData: ComplaintRecord | null;
+  impugnedData: ImpugnedRecord | null;
 }
 
 export const VALID_CASE_TYPES = [
