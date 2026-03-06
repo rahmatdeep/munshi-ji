@@ -149,6 +149,7 @@ export async function storePHHCCase(
           ? new Date(caseData.disposal_date)
           : null,
         disposalType: caseData.disposal_type,
+        lastSyncedAt: new Date(),
         rawData: {
           caseResponse: caseData,
           appealData,
@@ -180,6 +181,7 @@ export async function storePHHCCase(
           ? new Date(caseData.disposal_date)
           : null,
         disposalType: caseData.disposal_type,
+        lastSyncedAt: new Date(),
         rawData: {
           caseResponse: caseData,
           appealData,

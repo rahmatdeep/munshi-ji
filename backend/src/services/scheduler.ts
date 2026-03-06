@@ -2,6 +2,7 @@ import cron from "node-cron";
 import prisma from "../lib/prisma";
 import { generateCasesExcel, CaseExportData } from "../lib/excel";
 import { sendAdminExportEmail } from "../lib/mail";
+import { syncStaleCases } from "./sync";
 
 /**
  * Runs the export logic: fetches data, generates excel, and emails the admin.
@@ -71,11 +72,19 @@ export const runAdminExport = async () => {
  * Starts all scheduled tasks for the backend.
  */
 export const startScheduledTasks = () => {
-  // Run every day at 12 midnight
+  // Run daily midnight export job
   cron.schedule("0 0 * * *", async () => {
     console.log("Starting daily midnight export job...");
     await runAdminExport();
   });
 
-  console.log("Scheduler initialized: Daily export at 00:00");
+  // Run daily case sync job at 03:00 AM
+  cron.schedule("0 3 * * *", async () => {
+    console.log("Starting daily case sync job...");
+    await syncStaleCases();
+  });
+
+  console.log(
+    "Scheduler initialized: Daily export at 00:00, Daily sync at 03:00",
+  );
 };
