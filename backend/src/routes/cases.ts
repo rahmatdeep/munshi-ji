@@ -48,6 +48,7 @@ router.post(
             where: { id: req.user?.userId },
             select: { id: true },
           },
+          lastSyncedAt: true,
           personalNotes: {
             where: { userId: req.user?.userId },
           },
@@ -68,8 +69,9 @@ router.post(
         message: "Case data fetched successfully",
         case: {
           ...caseData,
-          personalNote: savedCase?.personalNotes?.[0] || null,
-          sharedNotes: savedCase?.sharedNotes || [],
+          lastSyncedAt: (savedCase as any)?.lastSyncedAt || null,
+          personalNote: (savedCase as any)?.personalNotes?.[0] || null,
+          sharedNotes: (savedCase as any)?.sharedNotes || [],
         },
         isSaved,
         caseId: savedCase?.id || null,
@@ -261,6 +263,7 @@ router.get(
               hearings: true,
               orders: true,
               objections: true,
+              lastSyncedAt: true,
               personalNotes: {
                 where: { userId: userId },
               },
@@ -310,6 +313,7 @@ router.get(
           hearings: true,
           orders: true,
           objections: true,
+          lastSyncedAt: true,
           sharedNotes: {
             include: {
               user: {
@@ -353,6 +357,69 @@ router.get(
       return res.json({ case: responseData });
     } catch (error) {
       console.error("Fetch case by ID error:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  },
+);
+/**
+ * POST /api/cases/:id/refresh
+ * Manually triggers a refresh for a specific case from PHHC.
+ */
+router.post(
+  "/:id/refresh",
+  authMiddleware,
+  async (req: AuthRequest, res: Response): Promise<Response | void> => {
+    const id = req.params.id as string;
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    try {
+      // 1. Find the case to get its identifying info
+      const caseRecord = await prisma.case.findUnique({
+        where: { id },
+      });
+
+      if (!caseRecord) {
+        return res.status(404).json({ error: "Case not found" });
+      }
+
+      // 2. Fetch fresh data from PHHC
+      const phhcData = await fetchPHHCCase({
+        case_type: caseRecord.caseType,
+        case_no: caseRecord.caseNo,
+        case_year: caseRecord.caseYear,
+      });
+
+      if (!phhcData) {
+        return res.status(404).json({ error: "Case not found on PHHC" });
+      }
+
+      // 3. Store updated data
+      const updatedCase = await storePHHCCase(
+        {
+          case_type: caseRecord.caseType,
+          case_no: caseRecord.caseNo,
+          case_year: caseRecord.caseYear,
+        },
+        phhcData,
+      );
+
+      return res.json({
+        message: "Case refreshed successfully",
+        case: updatedCase,
+      });
+    } catch (error: any) {
+      console.error("Case manual refresh error:", error);
+
+      if (error.message?.includes("PHHC API error")) {
+        return res.status(502).json({
+          error: "Failed to fetch data from PHHC. Please try again later.",
+        });
+      }
+
       return res.status(500).json({ error: "Internal server error" });
     }
   },
