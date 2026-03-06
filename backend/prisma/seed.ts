@@ -32,8 +32,22 @@ async function main() {
       role: "ADMIN",
     },
   });
+  const user3 = await prisma.user.upsert({
+    where: { email: "falguni4782@gmail.com" },
+    update: {
+      name: "Falguni",
+      lawyerId: "RJ-1234-2023", // Random ID
+      role: "ADMIN",
+    },
+    create: {
+      email: "falguni4782@gmail.com",
+      name: "Falguni",
+      lawyerId: "RJ-1234-2023",
+      role: "ADMIN",
+    },
+  });
 
-  console.log("Seeded users:", { admin, user2 });
+  console.log("Seeded users:", { admin, user3 });
 
 }
 
