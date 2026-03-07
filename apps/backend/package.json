@@ -1,5 +1,5 @@
 {
-  "name": "backend",
+  "name": "@munshi-ji/backend",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -11,7 +11,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.20.0",
+
   "dependencies": {
     "@prisma/client": "^6.19.2",
     "cors": "^2.8.6",
