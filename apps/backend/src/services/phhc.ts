@@ -1,5 +1,4 @@
-import { Prisma } from "@prisma/client";
-import prisma from "../lib/prisma";
+import { Prisma, prisma } from "@repo/db";
 
 const PHHC_API_BASE = "https://livedb9010.digitalls.in";
 

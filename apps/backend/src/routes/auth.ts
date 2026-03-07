@@ -12,7 +12,7 @@ import {
   AuthRequest,
   adminMiddleware,
 } from "../middleware/auth";
-import prisma from "../lib/prisma";
+import { prisma } from "@repo/db";
 import { sendMagicLink } from "../lib/mail";
 
 const router = Router();
