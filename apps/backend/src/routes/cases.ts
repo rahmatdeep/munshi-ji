@@ -7,7 +7,7 @@ import {
   unsaveCaseSchema,
   shareCaseSchema,
 } from "../types/savedCase";
-import prisma from "../lib/prisma";
+import { prisma } from "@repo/db";
 import { sendShareCaseEmail } from "../lib/mail";
 import { personalNoteSchema, sharedNoteSchema } from "../types/note";
 
