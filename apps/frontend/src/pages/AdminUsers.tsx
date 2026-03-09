@@ -14,6 +14,7 @@ import {
   AlertCircle,
   CheckCircle2,
   Trash2,
+  IdCard,
 } from "lucide-react";
 import Dropdown from "../components/ui/Dropdown";
 import { formatDate } from "../lib/date";
@@ -22,6 +23,7 @@ interface UserData {
   id: string;
   email: string;
   name: string | null;
+  lawyerId: string;
   role: "ADMIN" | "USER";
   createdAt: string;
 }
@@ -35,6 +37,7 @@ export default function AdminUsers() {
   const [isAddingUser, setIsAddingUser] = useState(false);
   const [newUserName, setNewUserName] = useState("");
   const [newUserEmail, setNewUserEmail] = useState("");
+  const [newUserLawyerId, setNewUserLawyerId] = useState("");
   const [newUserRole, setNewUserRole] = useState<"USER" | "ADMIN">("USER");
   const [actionStatus, setActionStatus] = useState<
     "idle" | "submitting" | "success" | "error"
@@ -74,6 +77,7 @@ export default function AdminUsers() {
         {
           name: newUserName,
           email: newUserEmail,
+          lawyerId: newUserLawyerId,
           role: newUserRole,
         },
         {
@@ -84,6 +88,7 @@ export default function AdminUsers() {
       setActionStatus("success");
       setNewUserName("");
       setNewUserEmail("");
+      setNewUserLawyerId("");
       setNewUserRole("USER");
       setIsAddingUser(false);
       fetchUsers();
@@ -170,7 +175,7 @@ export default function AdminUsers() {
                       <UserPlus className="w-5 h-5 text-(--primary)" />
                       Create New Account
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                       <div className="space-y-2">
                         <label className="text-xs font-bold text-(--foreground) uppercase tracking-wider block">
                           FullName
@@ -199,6 +204,22 @@ export default function AdminUsers() {
                             value={newUserEmail}
                             onChange={(e) => setNewUserEmail(e.target.value)}
                             placeholder="john@example.com"
+                            className="w-full bg-white/50 border-2 border-(--muted)/50 rounded-xl pl-11 pr-4 py-3 text-sm font-semibold outline-none focus:border-(--primary) focus:ring-4 focus:ring-(--primary)/10 transition-all"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-(--foreground) uppercase tracking-wider block">
+                          Lawyer ID
+                        </label>
+                        <div className="relative">
+                          <IdCard className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-(--secondary)" />
+                          <input
+                            type="text"
+                            required
+                            value={newUserLawyerId}
+                            onChange={(e) => setNewUserLawyerId(e.target.value)}
+                            placeholder="BAR/123/2023"
                             className="w-full bg-white/50 border-2 border-(--muted)/50 rounded-xl pl-11 pr-4 py-3 text-sm font-semibold outline-none focus:border-(--primary) focus:ring-4 focus:ring-(--primary)/10 transition-all"
                           />
                         </div>
@@ -256,6 +277,9 @@ export default function AdminUsers() {
                           User Details
                         </th>
                         <th className="px-8 py-5 text-xs font-bold text-(--secondary) uppercase tracking-widest">
+                          Lawyer ID
+                        </th>
+                        <th className="px-8 py-5 text-xs font-bold text-(--secondary) uppercase tracking-widest">
                           Role
                         </th>
                         <th className="px-8 py-5 text-xs font-bold text-(--secondary) uppercase tracking-widest">
@@ -287,6 +311,11 @@ export default function AdminUsers() {
                                 </p>
                               </div>
                             </div>
+                          </td>
+                          <td className="px-8 py-5">
+                            <code className="text-[10px] font-bold text-(--secondary) bg-(--muted)/20 px-2 py-1 rounded">
+                              {user.lawyerId}
+                            </code>
                           </td>
                           <td className="px-8 py-5">
                             <span
