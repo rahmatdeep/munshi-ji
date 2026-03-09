@@ -1,0 +1,22 @@
+# Turbo
+.turbo
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# OS Files
+.DS_Store
+
+# Logs
+*.log
+
+# pnpm store
+.pnpm-store

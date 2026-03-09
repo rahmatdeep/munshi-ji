@@ -1,7 +1,7 @@
 import { Router, Response } from "express";
 import { authMiddleware, AuthRequest } from "../middleware/auth";
 import { runAdminExport } from "../services/scheduler";
-import prisma from "../lib/prisma";
+import { prisma } from "@repo/db";
 
 const router = Router();
 

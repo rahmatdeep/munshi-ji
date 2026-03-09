@@ -1,5 +1,5 @@
 import cron from "node-cron";
-import prisma from "../lib/prisma";
+import { prisma } from "@repo/db";
 import { generateCasesExcel, CaseExportData } from "../lib/excel";
 import { sendAdminExportEmail } from "../lib/mail";
 
