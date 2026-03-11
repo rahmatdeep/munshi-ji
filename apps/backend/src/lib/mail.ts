@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { parseISTDate } from "../services/phhc";
 
 export const sendMagicLink = async (email: string, token: string) => {
   console.log(`Sending magic link to: ${email}`);
@@ -161,14 +162,15 @@ export const sendAdminExportEmail = async (
   }
 
   try {
-    const dateString = new Date().toLocaleDateString();
+    const istNow = parseISTDate(new Date().toISOString())!;
+    const dateString = istNow.toLocaleDateString("en-IN");
     const { data, error } = await resend.emails.send({
       from: "reports@resend.pardhan.cc",
       to: [email],
       subject: `Daily Cases Export - ${dateString}`,
       attachments: [
         {
-          filename: `cases_export_${new Date().toISOString().split("T")[0]}.xlsx`,
+          filename: `cases_export_${parseISTDate(new Date().toISOString())!.toISOString().split("T")[0]}.xlsx`,
           content: excelBuffer,
         },
       ],
