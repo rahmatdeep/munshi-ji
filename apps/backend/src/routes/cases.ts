@@ -48,7 +48,6 @@ router.post(
             where: { id: req.user?.userId },
             select: { id: true },
           },
-          lastSyncedAt: true,
           personalNotes: {
             where: { userId: req.user?.userId },
           },
@@ -263,7 +262,6 @@ router.get(
               hearings: true,
               orders: true,
               objections: true,
-              lastSyncedAt: true,
               personalNotes: {
                 where: { userId: userId },
               },
@@ -313,7 +311,6 @@ router.get(
           hearings: true,
           orders: true,
           objections: true,
-          lastSyncedAt: true,
           sharedNotes: {
             include: {
               user: {
