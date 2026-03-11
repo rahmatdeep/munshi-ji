@@ -49,6 +49,7 @@ router.get(
           ...(isAdmin && {
             role: true,
             createdAt: true,
+            lawyerId: true,
           }),
         },
       });
