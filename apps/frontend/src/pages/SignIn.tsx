@@ -64,7 +64,7 @@ export default function SignIn() {
               transition={{ delay: 0.2, duration: 0.5 }}
               className="mb-8"
             >
-              <h1 className="font-serif-logo text-4xl md:text-5xl font-bold tracking-tight text-(--foreground)">
+              <h1 className="font-serif-logo text-4xl md:text-5xl font-bold tracking-normal text-(--foreground)">
                 JAPSEHAJ SINGH
               </h1>
               <div className="h-0.5 w-12 bg-(--secondary) mx-auto mt-4 rounded-full opacity-50"></div>
