@@ -54,11 +54,8 @@ export default function Header() {
         className="flex items-center gap-3 md:gap-4 cursor-pointer"
         onClick={() => navigate("/dashboard")}
       >
-        <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-linear-to-br from-(--primary) to-(--primary-hover) text-(--primary-fg) flex items-center justify-center font-serif-logo font-bold text-xl md:text-2xl shadow-xl shadow-(--primary)/20 border border-(--primary)/30">
-          J
-        </div>
         <div>
-          <h1 className="font-serif-logo text-xl md:text-3xl font-bold tracking-tight text-(--foreground) leading-none mb-0.5 md:mb-1">
+          <h1 className="font-serif-logo text-xl md:text-3xl font-bold tracking-normal text-(--foreground) leading-none mb-0.5 md:mb-1">
             JAPSEHAJ SINGH
           </h1>
           <p className="text-[9px] md:text-xs text-(--secondary) font-bold tracking-[0.2em] uppercase">
