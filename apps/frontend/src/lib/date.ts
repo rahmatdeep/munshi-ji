@@ -19,8 +19,17 @@ export function formatDate(
   if (!dateInput) return "";
   try {
     let normalizedInput = dateInput;
-    if (typeof dateInput === "string" && dateInput.length <= 10 && !dateInput.includes("T")) {
-      normalizedInput = `${dateInput}T00:00:00+05:30`;
+    if (typeof dateInput === "string") {
+      const trimmed = dateInput.trim();
+      if (trimmed.length <= 10 && !trimmed.includes("T") && !trimmed.includes(":")) {
+        // Handle YYYY-MM-DD or DD-MM-YYYY
+        if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+          normalizedInput = `${trimmed}T00:00:00+05:30`;
+        } else if (/^\d{2}-\d{2}-\d{4}$/.test(trimmed)) {
+          const [d, m, y] = trimmed.split("-");
+          normalizedInput = `${y}-${m}-${d}T00:00:00+05:30`;
+        }
+      }
     }
     const date = new Date(normalizedInput as string | number | Date);
     if (isNaN(date.getTime())) return "";
