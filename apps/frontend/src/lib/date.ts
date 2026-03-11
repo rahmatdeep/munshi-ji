@@ -18,7 +18,11 @@ export function formatDate(
 ): string {
   if (!dateInput) return "";
   try {
-    const date = new Date(dateInput);
+    let normalizedInput = dateInput;
+    if (typeof dateInput === "string" && dateInput.length <= 10 && !dateInput.includes("T")) {
+      normalizedInput = `${dateInput}T00:00:00+05:30`;
+    }
+    const date = new Date(normalizedInput as string | number | Date);
     if (isNaN(date.getTime())) return "";
 
     const day = date.getDate().toString().padStart(2, "0");

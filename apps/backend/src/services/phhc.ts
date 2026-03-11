@@ -265,7 +265,7 @@ export async function storePHHCCase(
       update: {
         cnrNo: caseData.cnr_no?.toString() ?? null,
         filingNo: caseData.filling_no?.toString() ?? null,
-        regDate: caseData.reg_date ? new Date(caseData.reg_date) : null,
+        regDate: caseData.reg_date ? new Date(`${caseData.reg_date}T00:00:00+05:30`) : null,
         petName: caseData.pet_name,
         resName: caseData.res_name,
         petAdvName: caseData.pet_adv_name,
@@ -277,10 +277,10 @@ export async function storePHHCCase(
         district: caseData.district?.name?.trim() ?? null,
         establishment: caseData.establishments?.name?.trim() ?? null,
         nextListingDate: caseData.listing_or_proposal_date
-          ? new Date(caseData.listing_or_proposal_date)
+          ? new Date(`${caseData.listing_or_proposal_date}T00:00:00+05:30`)
           : null,
         disposalDate: caseData.disposal_date
-          ? new Date(caseData.disposal_date)
+          ? new Date(`${caseData.disposal_date}T00:00:00+05:30`)
           : null,
         disposalType: caseData.disposal_type,
         rawData,
@@ -291,7 +291,7 @@ export async function storePHHCCase(
         caseYear: case_year,
         cnrNo: caseData.cnr_no?.toString() ?? null,
         filingNo: caseData.filling_no?.toString() ?? null,
-        regDate: caseData.reg_date ? new Date(caseData.reg_date) : null,
+        regDate: caseData.reg_date ? new Date(`${caseData.reg_date}T00:00:00+05:30`) : null,
         petName: caseData.pet_name,
         resName: caseData.res_name,
         petAdvName: caseData.pet_adv_name,
@@ -303,10 +303,10 @@ export async function storePHHCCase(
         district: caseData.district?.name?.trim() ?? null,
         establishment: caseData.establishments?.name?.trim() ?? null,
         nextListingDate: caseData.listing_or_proposal_date
-          ? new Date(caseData.listing_or_proposal_date)
+          ? new Date(`${caseData.listing_or_proposal_date}T00:00:00+05:30`)
           : null,
         disposalDate: caseData.disposal_date
-          ? new Date(caseData.disposal_date)
+          ? new Date(`${caseData.disposal_date}T00:00:00+05:30`)
           : null,
         disposalType: caseData.disposal_type,
         rawData,
@@ -352,7 +352,7 @@ export async function storePHHCCase(
 
     const hearings = (hearingData?.data ?? []).map((h: HearingItem) => ({
       caseId,
-      hearingDate: new Date(h.cl_date),
+      hearingDate: new Date(`${h.cl_date}T00:00:00+05:30`),
       benchCode: h.bench_code,
       benchName: h.benchDetails?.bench_name ?? null,
       benchType: h.bench_type,
@@ -371,7 +371,7 @@ export async function storePHHCCase(
 
     const orders = (ordersData ?? []).map((o: OrderItem) => ({
       caseId,
-      orderDate: new Date(o.orderdate),
+      orderDate: new Date(`${o.orderdate}T00:00:00+05:30`),
       orderType: o.order_type,
       benchName: o.bench_name,
       benchCode: o.bench_code,

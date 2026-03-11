@@ -314,10 +314,16 @@ export default function NotesSection({
                         </span>
                         <span className="text-[9px] text-(--secondary) font-bold uppercase tracking-tighter mt-0.5">
                           {formatDate(note.createdAt)} at{" "}
-                          {new Date(note.createdAt).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
+                          {((): string => {
+                            const d = note.createdAt;
+                            const normalized = (typeof d === "string" && d.length <= 10 && !d.includes("T")) 
+                              ? `${d}T00:00:00+05:30` 
+                              : d;
+                            return new Date(normalized).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            });
+                          })()}
                         </span>
                       </div>
                     </div>
