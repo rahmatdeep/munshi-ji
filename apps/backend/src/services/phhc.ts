@@ -74,6 +74,7 @@ export function parseISTDate(dateStr: string | null | undefined): Date | null {
   return isNaN(fallback.getTime()) ? null : fallback;
 }
 
+
 // ─── Main service functions ──────────────────────────────────────
 
 /**
@@ -314,6 +315,7 @@ export async function storePHHCCase(
         nextListingDate: parseISTDate(caseData.listing_or_proposal_date),
         disposalDate: parseISTDate(caseData.disposal_date),
         disposalType: caseData.disposal_type,
+        lastSyncedAt: parseISTDate(new Date().toISOString()),
         rawData,
       },
       create: {
@@ -336,6 +338,7 @@ export async function storePHHCCase(
         nextListingDate: parseISTDate(caseData.listing_or_proposal_date),
         disposalDate: parseISTDate(caseData.disposal_date),
         disposalType: caseData.disposal_type,
+        lastSyncedAt: parseISTDate(new Date().toISOString()),
         rawData,
       },
     });
