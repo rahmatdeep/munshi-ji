@@ -39,6 +39,41 @@ async function phhcFetch<T>(url: string): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+/**
+ * Safely parses a date string and appends IST offset if missing.
+ * Handles YYYY-MM-DD, DD-MM-YYYY, and ISO formats.
+ */
+export function parseISTDate(dateStr: string | null | undefined): Date | null {
+  if (!dateStr || typeof dateStr !== "string") return null;
+
+  const trimmed = dateStr.trim();
+  if (!trimmed) return null;
+
+  // 1. If it already has time/timezone (ISO or similar), parse directly
+  if (trimmed.includes("T") || trimmed.includes(":") || (trimmed.includes(" ") && trimmed.length > 10)) {
+    const d = new Date(trimmed);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  // 2. Handle YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    const d = new Date(`${trimmed}T00:00:00+05:30`);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  // 3. Handle DD-MM-YYYY (Common in Indian Gov sites)
+  const ddmmyyyyMatch = trimmed.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+  if (ddmmyyyyMatch) {
+    const [_, d, m, y] = ddmmyyyyMatch;
+    const dObj = new Date(`${y}-${m}-${d}T00:00:00+05:30`);
+    return isNaN(dObj.getTime()) ? null : dObj;
+  }
+
+  // Fallback
+  const fallback = new Date(trimmed);
+  return isNaN(fallback.getTime()) ? null : fallback;
+}
+
 // ─── Main service functions ──────────────────────────────────────
 
 /**
@@ -265,7 +300,7 @@ export async function storePHHCCase(
       update: {
         cnrNo: caseData.cnr_no?.toString() ?? null,
         filingNo: caseData.filling_no?.toString() ?? null,
-        regDate: caseData.reg_date ? new Date(`${caseData.reg_date}T00:00:00+05:30`) : null,
+        regDate: parseISTDate(caseData.reg_date),
         petName: caseData.pet_name,
         resName: caseData.res_name,
         petAdvName: caseData.pet_adv_name,
@@ -276,12 +311,8 @@ export async function storePHHCCase(
         categoryDesc: caseData.cat_desc,
         district: caseData.district?.name?.trim() ?? null,
         establishment: caseData.establishments?.name?.trim() ?? null,
-        nextListingDate: caseData.listing_or_proposal_date
-          ? new Date(`${caseData.listing_or_proposal_date}T00:00:00+05:30`)
-          : null,
-        disposalDate: caseData.disposal_date
-          ? new Date(`${caseData.disposal_date}T00:00:00+05:30`)
-          : null,
+        nextListingDate: parseISTDate(caseData.listing_or_proposal_date),
+        disposalDate: parseISTDate(caseData.disposal_date),
         disposalType: caseData.disposal_type,
         rawData,
       },
@@ -291,7 +322,7 @@ export async function storePHHCCase(
         caseYear: case_year,
         cnrNo: caseData.cnr_no?.toString() ?? null,
         filingNo: caseData.filling_no?.toString() ?? null,
-        regDate: caseData.reg_date ? new Date(`${caseData.reg_date}T00:00:00+05:30`) : null,
+        regDate: parseISTDate(caseData.reg_date),
         petName: caseData.pet_name,
         resName: caseData.res_name,
         petAdvName: caseData.pet_adv_name,
@@ -302,12 +333,8 @@ export async function storePHHCCase(
         categoryDesc: caseData.cat_desc,
         district: caseData.district?.name?.trim() ?? null,
         establishment: caseData.establishments?.name?.trim() ?? null,
-        nextListingDate: caseData.listing_or_proposal_date
-          ? new Date(`${caseData.listing_or_proposal_date}T00:00:00+05:30`)
-          : null,
-        disposalDate: caseData.disposal_date
-          ? new Date(`${caseData.disposal_date}T00:00:00+05:30`)
-          : null,
+        nextListingDate: parseISTDate(caseData.listing_or_proposal_date),
+        disposalDate: parseISTDate(caseData.disposal_date),
         disposalType: caseData.disposal_type,
         rawData,
       },
@@ -352,7 +379,7 @@ export async function storePHHCCase(
 
     const hearings = (hearingData?.data ?? []).map((h: HearingItem) => ({
       caseId,
-      hearingDate: new Date(`${h.cl_date}T00:00:00+05:30`),
+      hearingDate: parseISTDate(h.cl_date)!,
       benchCode: h.bench_code,
       benchName: h.benchDetails?.bench_name ?? null,
       benchType: h.bench_type,
@@ -371,7 +398,7 @@ export async function storePHHCCase(
 
     const orders = (ordersData ?? []).map((o: OrderItem) => ({
       caseId,
-      orderDate: new Date(`${o.orderdate}T00:00:00+05:30`),
+      orderDate: parseISTDate(o.orderdate)!,
       orderType: o.order_type,
       benchName: o.bench_name,
       benchCode: o.bench_code,

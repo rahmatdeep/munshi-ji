@@ -316,9 +316,18 @@ export default function NotesSection({
                           {formatDate(note.createdAt)} at{" "}
                           {((): string => {
                             const d = note.createdAt;
-                            const normalized = (typeof d === "string" && d.length <= 10 && !d.includes("T")) 
-                              ? `${d}T00:00:00+05:30` 
-                              : d;
+                            let normalized = d;
+                            if (typeof d === "string") {
+                              const trimmed = d.trim();
+                              if (trimmed.length <= 10 && !trimmed.includes("T") && !trimmed.includes(":")) {
+                                if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+                                  normalized = `${trimmed}T00:00:00+05:30`;
+                                } else if (/^\d{2}-\d{2}-\d{4}$/.test(trimmed)) {
+                                  const [dd, mm, yyyy] = trimmed.split("-");
+                                  normalized = `${yyyy}-${mm}-${dd}T00:00:00+05:30`;
+                                }
+                              }
+                            }
                             return new Date(normalized).toLocaleTimeString([], {
                               hour: "2-digit",
                               minute: "2-digit",
