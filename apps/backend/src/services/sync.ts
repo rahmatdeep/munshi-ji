@@ -1,5 +1,66 @@
-import { fetchAndStorePHHCCase, parseISTDate } from "./phhc";
+import { fetchAndStorePHHCCase, parseISTDate, getISTDayRange } from "./phhc";
 import { prisma } from "@repo/db";
+
+/**
+ * Syncs cases that have a hearing today or tomorrow.
+ * This ensures the cause list (court no, sr no) is always up to date.
+ */
+export async function syncUpcomingHearings() {
+  console.log("Starting sync of upcoming hearings (Cause List)...");
+
+  const { start, end } = getISTDayRange();
+
+  // Find all cases that have a hearing within the next 48 hours
+  const hearings = await prisma.caseHearing.findMany({
+    where: {
+      hearingDate: {
+        gte: start,
+        lte: end,
+      },
+    },
+    include: {
+      case: {
+        select: {
+          caseType: true,
+          caseNo: true,
+          caseYear: true,
+          lastSyncedAt: true,
+        },
+      },
+    },
+  });
+
+  // Unique list of cases to sync
+  const uniqueCases = Array.from(
+    new Map(hearings.map((h) => [h.caseId, h.case])).values()
+  );
+
+  console.log(`Found ${uniqueCases.length} unique cases with upcoming hearings.`);
+
+  for (const c of uniqueCases) {
+    try {
+      // For upcoming hearings, we sync if not synced in the last hour
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+      if (!c.lastSyncedAt || c.lastSyncedAt < oneHourAgo) {
+        console.log(`Syncing upcoming case: ${c.caseType} ${c.caseNo}/${c.caseYear}`);
+        await fetchAndStorePHHCCase({
+          case_type: c.caseType,
+          case_no: c.caseNo,
+          case_year: c.caseYear,
+        });
+        // Small throttle
+        await new Promise((resolve) => setTimeout(resolve, 300));
+      }
+    } catch (error) {
+      console.error(
+        `Failed to sync upcoming case ${c.caseType} ${c.caseNo}/${c.caseYear}:`,
+        error,
+      );
+    }
+  }
+
+  console.log("Upcoming hearings sync completed.");
+}
 
 /**
  * Syncs cases that have a passed nextListingDate and are still PENDING.
