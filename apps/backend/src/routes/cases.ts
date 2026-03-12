@@ -1,6 +1,12 @@
 import { Router, Response } from "express";
 import { authMiddleware, AuthRequest } from "../middleware/auth";
-import { fetchPHHCCase, storePHHCCase } from "../services/phhc";
+import {
+  fetchPHHCCase,
+  storePHHCCase,
+  getISTDayRange,
+  fetchAndStorePHHCCase,
+} from "../services/phhc";
+import { CauseListResponse } from "../types/causeList";
 import { fetchCaseSchema } from "../types/phhc";
 import {
   saveCaseSchema,
@@ -289,6 +295,84 @@ router.get(
       return res.status(500).json({ error: "Internal server error" });
     }
   },
+);
+
+/**
+ * GET /api/cases/cause-list
+ * Retrieves cases with hearings today or tomorrow, ensuring fresh data.
+ */
+router.get(
+  "/cause-list",
+  authMiddleware,
+  async (req: AuthRequest, res: Response): Promise<Response | void> => {
+    const userId = req.user?.userId;
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+    try {
+      const { start, end } = getISTDayRange();
+
+      // 1. Find all saved cases for the user that have a hearing in the range
+      const causeListHearings = await prisma.caseHearing.findMany({
+        where: {
+          hearingDate: {
+            gte: start,
+            lte: end,
+          },
+          case: {
+            savedBy: {
+              some: { id: userId },
+            },
+          },
+        },
+        include: {
+          case: {
+            include: {
+              parties: true,
+              _count: {
+                select: {
+                  personalNotes: { where: { userId } }
+                }
+              },
+              personalNotes: {
+                where: { userId }
+              }
+            },
+          },
+        },
+        orderBy: {
+          hearingDate: "asc",
+        },
+      });
+
+      // 2. Format the response
+      const formattedList = causeListHearings.map((h) => {
+        // A hearing is considered "pending details" if it's in the cause list window
+        // (today/tomorrow) but the court doesn't have courtNo or srNo yet.
+        const isDetailsPending = !h.courtNo || !h.srNo;
+
+        return {
+          ...h,
+          isDetailsPending,
+          case: {
+            ...h.case,
+            personalNote: (h.case as any).personalNotes?.[0] || null,
+            personalNotes: undefined,
+          },
+        };
+      });
+
+      const response: CauseListResponse = {
+        causeList: formattedList as any,
+        startDate: start.toISOString(),
+        endDate: end.toISOString(),
+      };
+
+      return res.json(response);
+    } catch (error) {
+      console.error("Cause list error:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  }
 );
 
 /**

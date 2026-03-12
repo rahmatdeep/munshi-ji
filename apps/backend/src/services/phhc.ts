@@ -74,6 +74,43 @@ export function parseISTDate(dateStr: string | null | undefined): Date | null {
   return isNaN(fallback.getTime()) ? null : fallback;
 }
 
+/**
+ * Returns the start of today and end of tomorrow in IST.
+ * Useful for querying hearings in the next 48-hour window.
+ */
+export function getISTDayRange() {
+  // Get current time in IST
+  const nowIST = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+  
+  // Start of today (00:00:00 IST)
+  const startOfToday = new Date(nowIST);
+  startOfToday.setHours(0, 0, 0, 0);
+  
+  // End of tomorrow (23:59:59 IST)
+  const endOfTomorrow = new Date(nowIST);
+  endOfTomorrow.setDate(nowIST.getDate() + 1);
+  endOfTomorrow.setHours(23, 59, 59, 999);
+
+  // Convert these "browser/local-like" IST dates back to absolute Date objects
+  // that Prisma/Postgres will treat as UTC or with appropriate offset.
+  // Since our parseISTDate uses +05:30, we should be consistent.
+  
+  const formatDate = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mm = String(d.getMinutes()).padStart(2, '0');
+    const ss = String(d.getSeconds()).padStart(2, '0');
+    return `${y}-${m}-${day}T${hh}:${mm}:${ss}+05:30`;
+  };
+
+  return {
+    start: new Date(formatDate(startOfToday)),
+    end: new Date(formatDate(endOfTomorrow)),
+  };
+}
+
 
 // ─── Main service functions ──────────────────────────────────────
 

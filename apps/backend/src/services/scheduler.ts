@@ -2,7 +2,7 @@ import cron from "node-cron";
 import { prisma } from "@repo/db";
 import { generateCasesExcel, CaseExportData } from "../lib/excel";
 import { sendAdminExportEmail } from "../lib/mail";
-import { syncStaleCases } from "./sync";
+import { syncStaleCases, syncUpcomingHearings } from "./sync";
 
 /**
  * Runs the export logic: fetches data, generates excel, and emails the admin.
@@ -92,7 +92,17 @@ export const startScheduledTasks = () => {
     { timezone: "Asia/Kolkata" },
   );
 
+  // Run hourly cause list sync job (IST)
+  cron.schedule(
+    "0 * * * *",
+    async () => {
+      console.log("Starting hourly cause list sync job...");
+      await syncUpcomingHearings();
+    },
+    { timezone: "Asia/Kolkata" },
+  );
+
   console.log(
-    "Scheduler initialized: Daily export at 00:00, Daily sync at 03:00",
+    "Scheduler initialized: Daily export at 00:00, Daily sync at 03:00, Hourly cause list sync",
   );
 };
