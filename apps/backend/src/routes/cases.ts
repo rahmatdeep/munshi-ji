@@ -1,4 +1,4 @@
-import { Router, Response } from "express";
+import { Router, Response, NextFunction } from "express";
 import { authMiddleware, AuthRequest } from "../middleware/auth";
 import {
   fetchPHHCCase,
@@ -16,8 +16,66 @@ import {
 import { prisma } from "@repo/db";
 import { sendShareCaseEmail } from "../lib/mail";
 import { personalNoteSchema, sharedNoteSchema } from "../types/note";
+import multer from "multer";
+import path from "path";
+import {
+  createAttachmentSchema,
+  editAttachmentSchema,
+  attachmentTypeEnum,
+} from "../types/attachment";
+import {
+  ensureCaseAttachmentDir,
+  generateStoredFilename,
+  getAttachmentFilePath,
+  deleteAttachmentFile,
+} from "../lib/attachmentStorage";
 
 const router = Router();
+
+// Multer setup for file uploads
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      const caseId = Array.isArray(req.params.caseId) ? req.params.caseId[0] : req.params.caseId;
+      const dir = ensureCaseAttachmentDir(caseId);
+      cb(null, dir);
+    },
+    filename: (req, file, cb) => {
+      cb(null, generateStoredFilename(file.originalname));
+    },
+  }),
+  limits: { fileSize: 100 * 1024 * 1024 }, // 100MB
+  fileFilter: (req, file, cb) => {
+    // Accept only common doc/image types
+    const allowed = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ];
+    if (allowed.includes(file.mimetype)) cb(null, true);
+    else cb(new Error("Unsupported file type"));
+  },
+});
+
+// Middleware: ensure user has saved the case
+async function requireSavedCase(req: AuthRequest, res: Response, next: NextFunction) {
+  const userId = req.user?.userId;
+  const caseId = Array.isArray(req.params.caseId) ? req.params.caseId[0] : req.params.caseId;
+  if (!userId || !caseId) return res.status(400).json({ error: "Missing user or case" });
+  const found = await prisma.case.findFirst({
+    where: {
+      id: caseId,
+      savedBy: { some: { id: userId } },
+    },
+  });
+  if (!found) return res.status(403).json({ error: "Not authorized for this case" });
+  next();
+}
 
 /**
  * POST /api/cases/fetch
@@ -699,6 +757,140 @@ router.delete(
       return res.status(500).json({ error: "Internal server error" });
     }
   },
+);
+
+// --- Attachments ---
+/**
+ * POST /api/cases/:caseId/attachments (upload or link)
+ */
+router.post(
+  "/:caseId/attachments",
+  authMiddleware,
+  requireSavedCase,
+  upload.single("file"),
+  async (req: AuthRequest, res: Response) => {
+    try {
+      const parsed = createAttachmentSchema.safeParse({
+        ...req.body,
+        file: req.file,
+      });
+      if (!parsed.success) return res.status(400).json({ errors: parsed.error.issues });
+      const { type, title, description, url } = parsed.data;
+      let data: any = {
+        caseId: req.params.caseId,
+        uploaderId: req.user?.userId,
+        type,
+        title,
+        description,
+      };
+      if (type === "UPLOAD") {
+        if (!req.file) return res.status(400).json({ error: "File required" });
+        data.filename = req.file.filename;
+        data.originalName = req.file.originalname;
+        data.mimetype = req.file.mimetype;
+        data.size = req.file.size;
+      } else if (type === "LINK") {
+        if (!url) return res.status(400).json({ error: "URL required" });
+        data.url = url;
+      }
+      const latestVersion = await prisma.caseAttachment.aggregate({
+        where: { caseId: req.params.caseId as string, title },
+        _max: { version: true },
+      });
+      data.version = (latestVersion._max?.version || 0) + 1;
+      const attachment = await prisma.caseAttachment.create({ data });
+      res.json({ message: "Attachment added", attachment });
+    } catch (err) {
+      res.status(500).json({ error: "Failed to add attachment" });
+    }
+  }
+);
+
+/**
+ * GET /api/cases/:caseId/attachments (list)
+ */
+router.get(
+  "/:caseId/attachments",
+  authMiddleware,
+  requireSavedCase,
+  async (req: AuthRequest, res: Response) => {
+    const attachments = await prisma.caseAttachment.findMany({
+      where: { caseId: req.params.caseId as string, deleted: false },
+      orderBy: [{ createdAt: "desc" }],
+    });
+    res.json({ attachments });
+  }
+);
+
+/**
+ * GET /api/cases/:caseId/attachments/:attachmentId (download file or get link)
+ */
+router.get(
+  "/:caseId/attachments/:attachmentId",
+  authMiddleware,
+  requireSavedCase,
+  async (req: AuthRequest, res: Response) => {
+    const att = await prisma.caseAttachment.findUnique({
+      where: { id: req.params.attachmentId as string },
+    });
+    if (!att || att.caseId !== req.params.caseId || att.deleted)
+      return res.status(404).json({ error: "Attachment not found" });
+    if (att.type === "UPLOAD") {
+      const filePath = getAttachmentFilePath(att.caseId, att.filename!);
+      return res.download(filePath, att.originalName || att.filename || "attachment");
+    } else if (att.type === "LINK") {
+      return res.json({ url: att.url, title: att.title, description: att.description });
+    }
+    res.status(400).json({ error: "Invalid attachment type" });
+  }
+);
+
+/**
+ * DELETE /api/cases/:caseId/attachments/:attachmentId
+ */
+router.delete(
+  "/:caseId/attachments/:attachmentId",
+  authMiddleware,
+  requireSavedCase,
+  async (req: AuthRequest, res: Response) => {
+    const att = await prisma.caseAttachment.findUnique({ where: { id: req.params.attachmentId as string } });
+    if (!att || att.caseId !== req.params.caseId || att.deleted)
+      return res.status(404).json({ error: "Attachment not found" });
+    // Any user with the case can delete
+    if (att.type === "UPLOAD" && att.filename) {
+      deleteAttachmentFile(att.caseId, att.filename);
+    }
+    await prisma.caseAttachment.update({
+      where: { id: att.id },
+      data: {
+        deleted: true,
+        deletedById: req.user?.userId,
+        deletedAt: new Date(),
+      },
+    });
+    res.json({ message: "Attachment deleted" });
+  }
+);
+
+/**
+ * PATCH /api/cases/:caseId/attachments/:attachmentId (edit metadata)
+ */
+router.patch(
+  "/:caseId/attachments/:attachmentId",
+  authMiddleware,
+  requireSavedCase,
+  async (req: AuthRequest, res: Response) => {
+    const att = await prisma.caseAttachment.findUnique({ where: { id: req.params.attachmentId as string } });
+    if (!att || att.caseId !== req.params.caseId || att.deleted)
+      return res.status(404).json({ error: "Attachment not found" });
+    const parsed = editAttachmentSchema.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ errors: parsed.error.issues });
+    const updated = await prisma.caseAttachment.update({
+      where: { id: att.id },
+      data: parsed.data,
+    });
+    res.json({ message: "Attachment updated", attachment: updated });
+  }
 );
 
 export default router;
