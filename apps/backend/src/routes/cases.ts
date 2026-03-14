@@ -233,6 +233,7 @@ router.post(
       return res.json({
         message: "Case saved successfully",
         case: storedCase,
+        caseId: storedCase.id,
       });
     } catch (error) {
       console.error("Case save error:", error);

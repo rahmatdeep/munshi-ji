@@ -236,7 +236,7 @@ export default function NotesSection({
               />
             ) : (
               <>
-                <Save className="w-4 h-4" /> Secure Save
+                <Save className="w-4 h-4" /> Save
               </>
             )}
           </button>

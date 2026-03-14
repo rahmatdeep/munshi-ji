@@ -212,7 +212,7 @@ export default function CaseDetails() {
                       ) : (
                         <>
                           <Trash2 className="w-4 h-4" />
-                          Unsave Dashboard
+                          Unsave Case
                         </>
                       )}
                     </button>
