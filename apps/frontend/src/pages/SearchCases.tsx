@@ -9,7 +9,6 @@ import {
   Scale,
   Calendar,
   Hash,
-  CheckCircle,
   Info,
   Briefcase,
   BookmarkMinus,
@@ -172,7 +171,6 @@ export default function SearchCases() {
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [savedCaseId, setSavedCaseId] = useState<string | null>(null);
-  const [saveSuccess, setSaveSuccess] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const handleSearch = useCallback(
@@ -204,7 +202,6 @@ export default function SearchCases() {
         setIsSaved(response.data.isSaved || false);
         setSavedCaseId(response.data.caseId || null);
         setStatus("success");
-        setSaveSuccess(false); // Reset save state on new search
       } catch (err: any) {
         console.error("Fetch error:", err);
         setError(
@@ -250,7 +247,7 @@ export default function SearchCases() {
     }
   }, [caseType, caseNo, caseYear, handleSearch, searchParams]);
 
-  const handleSaveCase = async () => {
+  const handleSaveCase = useCallback(async () => {
     if (!caseData) return;
 
     setIsSaving(true);
@@ -270,12 +267,14 @@ export default function SearchCases() {
         },
       );
 
-      const newCaseId = response.data.caseId;
+      const newCaseId = response.data.caseId || response.data.case?.id;
+      
       setSavedCaseId(newCaseId);
       setIsSaved(true);
-      setSaveSuccess(true);
-      // Automatically clear success message after 3 seconds
-      setTimeout(() => setSaveSuccess(false), 3000);
+      // Update case data with what the backend stored (may have more relations/details)
+      if (response.data.case) {
+        setCaseData(response.data.case);
+      }
     } catch (err: any) {
       console.error("Save error:", err);
       alert(
@@ -284,9 +283,9 @@ export default function SearchCases() {
     } finally {
       setIsSaving(false);
     }
-  };
+  }, [caseData, caseType, caseNo, caseYear]);
 
-  const handleUnsaveCase = async () => {
+  const handleUnsaveCase = useCallback(async () => {
     if (!savedCaseId) return;
 
     setIsSaving(true);
@@ -314,7 +313,7 @@ export default function SearchCases() {
     } finally {
       setIsSaving(false);
     }
-  };
+  }, [savedCaseId]);
 
   return (
     <>
@@ -510,6 +509,7 @@ export default function SearchCases() {
                   caseType={caseType}
                   caseNo={caseNo}
                   caseYear={caseYear}
+                  lastSyncedAt={isSaved ? caseData?.lastSyncedAt : undefined}
                 >
                   {isSaved ? (
                     <div className="flex flex-col sm:flex-row items-center gap-3">
@@ -546,12 +546,8 @@ export default function SearchCases() {
                   ) : (
                     <button
                       onClick={handleSaveCase}
-                      disabled={isSaving || saveSuccess}
-                      className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold shadow-md transition-all ${
-                        saveSuccess
-                          ? "bg-green-600 hover:bg-green-700 text-white shadow-green-600/20"
-                          : "bg-(--primary) hover:bg-(--primary-hover) text-(--primary-fg) shadow-(--primary)/20 hover:-translate-y-0.5"
-                      } disabled:opacity-80 disabled:cursor-not-allowed`}
+                      disabled={isSaving}
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold shadow-md transition-all bg-(--primary) hover:bg-(--primary-hover) text-(--primary-fg) shadow-(--primary)/20 hover:-translate-y-0.5 disabled:opacity-80 disabled:cursor-not-allowed"
                     >
                       {isSaving ? (
                         <motion.div
@@ -563,11 +559,6 @@ export default function SearchCases() {
                           }}
                           className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
                         />
-                      ) : saveSuccess ? (
-                        <>
-                          <CheckCircle className="w-4 h-4" />
-                          Saved to Dashboard
-                        </>
                       ) : (
                         <>
                           <Briefcase className="w-4 h-4" />

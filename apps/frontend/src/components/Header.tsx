@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Search, LogOut, LayoutDashboard, Users } from "lucide-react";
+import { Search, LogOut, LayoutDashboard, Users, ListOrdered } from "lucide-react";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -26,6 +26,12 @@ export default function Header() {
       label: "Dashboard",
       icon: LayoutDashboard,
       path: "/dashboard",
+      show: true,
+    },
+    {
+      label: "Cause List",
+      icon: ListOrdered,
+      path: "/cause-list",
       show: true,
     },
     {

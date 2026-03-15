@@ -7,5 +7,3 @@
 - if user does not exist in db (for magic link), throw error to fe
 - better UI for Personal Notepad
 - check if diary no is correctly displayed on dashboard and ensure its not using filling no on case view and dashboard
-- change unsave dashboard to unsave case
-- see why we cannot unsave on the search page (if we save there)

@@ -12,9 +12,11 @@ import {
   Trash2,
   ChevronRight,
   Search,
+  RefreshCw,
+  Clock,
 } from "lucide-react";
 import { useConfirm } from "../hooks/useConfirm";
-import { formatDate } from "../lib/date";
+import { formatDate, formatDateTime } from "../lib/date";
 
 export default function Dashboard() {
   const [status, setStatus] = useState<
@@ -24,6 +26,7 @@ export default function Dashboard() {
   const [savedCases, setSavedCases] = useState<any[]>([]);
   const navigate = useNavigate();
   const confirm = useConfirm();
+  const [syncingId, setSyncingId] = useState<string | null>(null);
 
   const [currentUser] = useState<any>(() => {
     try {
@@ -63,6 +66,32 @@ export default function Dashboard() {
     };
     init();
   }, []);
+
+  const handleSyncCase = async (caseId: string) => {
+    setSyncingId(caseId);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        `${API_URL}/api/cases/${caseId}/refresh`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      // Update the case in the local state with fresh data
+      setSavedCases((prev) =>
+        prev.map((c) => (c.id === caseId ? response.data.case : c)),
+      );
+    } catch (err: any) {
+      console.error("Sync error:", err);
+      alert(err.response?.data?.error || "Failed to synchronize case.");
+    } finally {
+      setSyncingId(null);
+    }
+  };
 
   const handleUnsave = async (caseId: string) => {
     const confirmed = await confirm({
@@ -282,6 +311,26 @@ export default function Dashboard() {
                       <p className="text-xs font-semibold text-(--foreground)">
                         {c.filingNo || "N/A"}
                       </p>
+                    </div>
+                  </div>
+
+                  <div className="pt-3 flex flex-col gap-2 border-t border-(--muted)/20 mt-3">
+                    <div className="flex items-center justify-between text-[9px] text-(--secondary) font-medium uppercase tracking-wider">
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-2.5 h-2.5" />
+                        Last Synced:{" "}
+                        {c.lastSyncedAt ? formatDateTime(c.lastSyncedAt) : "Never"}
+                      </span>
+                      <button
+                        onClick={() => handleSyncCase(c.id)}
+                        disabled={syncingId === c.id}
+                        className="flex items-center gap-1 text-(--primary) hover:underline disabled:opacity-50 disabled:no-underline"
+                      >
+                        <RefreshCw
+                          className={`w-3 h-3 ${syncingId === c.id ? "animate-spin" : ""}`}
+                        />
+                        Sync
+                      </button>
                     </div>
                   </div>
 
