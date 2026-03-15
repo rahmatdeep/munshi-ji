@@ -209,8 +209,14 @@ export default function CauseList() {
                     </div>
 
                     <div className="mb-6 flex-1">
-                      <h3 className="text-base font-serif-logo font-bold text-(--foreground) leading-tight mb-1 line-clamp-2">
-                        {c.petName} <span className="text-[10px] text-(--secondary) font-normal px-1">vs</span> {c.resName}
+                      <h3 className="text-base md:text-lg font-serif-logo font-bold text-(--foreground) leading-tight mb-1 line-clamp-2">
+                        {c.petName || "Petitioner"}
+                      </h3>
+                      <p className="text-[10px] text-(--secondary) italic font-serif-logo my-1">
+                        vs
+                      </p>
+                      <h3 className="text-base md:text-lg font-serif-logo font-bold text-(--foreground) leading-tight line-clamp-2">
+                        {c.resName || "Respondent"}
                       </h3>
                       <div className="mt-4 grid grid-cols-2 gap-4">
                         <div className="space-y-1">
