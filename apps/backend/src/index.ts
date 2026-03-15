@@ -4,6 +4,7 @@ import cors from "cors";
 import authRouter from "./routes/auth";
 import casesRouter from "./routes/cases";
 import adminRouter from "./routes/admin";
+import telegramRouter from "./routes/telegram";
 import { startScheduledTasks } from "./services/scheduler";
 
 const app = express();
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use("/api/auth", authRouter);
 app.use("/api/cases", casesRouter);
 app.use("/api/admin", adminRouter);
+app.use("/api/telegram", telegramRouter);
 
 // Start scheduled tasks (e.g., daily midnight export)
 startScheduledTasks();
