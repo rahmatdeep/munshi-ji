@@ -21,7 +21,11 @@ export function formatDate(
     let normalizedInput = dateInput;
     if (typeof dateInput === "string") {
       const trimmed = dateInput.trim();
-      if (trimmed.length <= 10 && !trimmed.includes("T") && !trimmed.includes(":")) {
+      if (
+        trimmed.length <= 10 &&
+        !trimmed.includes("T") &&
+        !trimmed.includes(":")
+      ) {
         // Handle YYYY-MM-DD or DD-MM-YYYY
         if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
           normalizedInput = `${trimmed}T00:00:00+05:30`;
@@ -39,6 +43,24 @@ export function formatDate(
     const year = date.getFullYear();
 
     return `${day}-${month}-${year}`;
+  } catch {
+    return "";
+  }
+}
+
+export function formatDateTime(
+  dateInput: string | number | Date | null | undefined,
+): string {
+  if (!dateInput) return "";
+  try {
+    const date = new Date(dateInput);
+    if (isNaN(date.getTime())) return "";
+
+    const dateStr = formatDate(date);
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+
+    return `${dateStr} ${hours}:${minutes}`;
   } catch {
     return "";
   }

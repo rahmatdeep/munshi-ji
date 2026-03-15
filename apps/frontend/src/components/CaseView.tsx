@@ -7,8 +7,10 @@ import {
   Briefcase,
   Search,
   ChevronRight,
+  Clock,
+  RefreshCw,
 } from "lucide-react";
-import { formatDate } from "../lib/date";
+import { formatDate, formatDateTime } from "../lib/date";
 
 interface CaseViewProps {
   caseData: any;
@@ -16,6 +18,9 @@ interface CaseViewProps {
   caseNo?: string;
   caseYear?: string;
   children?: React.ReactNode;
+  lastSyncedAt?: Date | string;
+  onRefresh?: () => void;
+  isSyncing?: boolean;
 }
 
 export default function CaseView({
@@ -24,6 +29,9 @@ export default function CaseView({
   caseNo,
   caseYear,
   children,
+  lastSyncedAt,
+  onRefresh,
+  isSyncing,
 }: CaseViewProps) {
   if (!caseData) return null;
 
@@ -282,6 +290,33 @@ export default function CaseView({
                 {benchName}
               </p>
             </div>
+            {lastSyncedAt && (
+              <div className="bg-white/40 rounded-2xl p-4 border border-white/50 hover:bg-white/60 transition-colors flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] text-(--secondary) uppercase tracking-[0.2em] font-bold mb-1 flex items-center gap-2">
+                    <Clock className="w-3 h-3" /> Last Synced
+                  </p>
+                  <p className="text-sm font-semibold text-(--foreground)">
+                    {formatDateTime(lastSyncedAt)}
+                  </p>
+                </div>
+                {onRefresh && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onRefresh();
+                    }}
+                    disabled={isSyncing}
+                    className="p-2 rounded-xl bg-(--primary)/10 text-(--primary) hover:bg-(--primary) hover:text-(--primary-fg) transition-all disabled:opacity-50"
+                    title="Refresh case data"
+                  >
+                    <RefreshCw
+                      className={`w-4 h-4 ${isSyncing ? "animate-spin" : ""}`}
+                    />
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

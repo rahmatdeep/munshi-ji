@@ -509,6 +509,7 @@ export default function SearchCases() {
                   caseType={caseType}
                   caseNo={caseNo}
                   caseYear={caseYear}
+                  lastSyncedAt={isSaved ? caseData?.lastSyncedAt : undefined}
                 >
                   {isSaved ? (
                     <div className="flex flex-col sm:flex-row items-center gap-3">

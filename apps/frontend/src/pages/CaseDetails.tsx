@@ -22,6 +22,7 @@ export default function CaseDetails() {
   const [caseData, setCaseData] = useState<any>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   useEffect(() => {
@@ -111,6 +112,29 @@ export default function CaseDetails() {
     }
   };
 
+  const handleSync = async () => {
+    if (!id) return;
+    setIsSyncing(true);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        `${API_URL}/api/cases/${id}/refresh`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      setCaseData(response.data.case);
+    } catch (err: any) {
+      console.error("Sync error:", err);
+      alert(err.response?.data?.error || "Failed to synchronize case.");
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   return (
     <>
       <div className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-8 lg:p-10 flex flex-col justify-start">
@@ -184,6 +208,9 @@ export default function CaseDetails() {
                 caseType={caseData.caseType}
                 caseNo={caseData.caseNo}
                 caseYear={caseData.caseYear}
+                lastSyncedAt={isSaved ? caseData?.lastSyncedAt : undefined}
+                onRefresh={isSaved ? handleSync : undefined}
+                isSyncing={isSyncing}
               >
                 <div className="flex flex-col sm:flex-row items-center gap-3">
                   <button

@@ -5,6 +5,7 @@ import Dashboard from "./pages/Dashboard";
 import SearchCases from "./pages/SearchCases";
 import CaseDetails from "./pages/CaseDetails";
 import AdminUsers from "./pages/AdminUsers";
+import CauseList from "./pages/CauseList";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ConfirmProvider } from "./context/ConfirmContext";
 
@@ -17,6 +18,7 @@ function App() {
           <Route path="/verify-magic-link" element={<VerifyMagicLink />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/cause-list" element={<CauseList />} />
             <Route path="/search" element={<SearchCases />} />
             <Route path="/case/:id" element={<CaseDetails />} />
             <Route path="/share/case/:id" element={<CaseDetails />} />
